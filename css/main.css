@@ -1,28 +1,44 @@
-
 html {
 	height: 100%;
-	background: #CCCCCC
+	background: black
 }
 
-
 body {
+	text-align: center;
+	color: white;
 	margin: auto;
 	width: 75%;
 	color: #000000;
-	background-color: #FFFFFF;
+	background: #CCCCCC;
 	height: 100%;
-	padding-left: 5em;
-	padding-right: 5em;
 	padding-top: 0.1em;
 }
 
+.link {
+	color:black;
+}
+
+.link:visited {
+	color:black;
+}
+
+.link:hover {
+	color:#CC0000;
+}
+
+.link:active {
+	color:black;
+}
+
+.icon {
+	font-size: 60px;
+}
 
 footer {
 	position: fixed;
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: #CCCCCC;
 	text-align: center;
 }
 
