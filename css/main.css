@@ -29,6 +29,7 @@ body {
 */
 
 #intro {
+	align-content: center;
 	text-align: left;
 	margin: auto;
 	width: 50%;
