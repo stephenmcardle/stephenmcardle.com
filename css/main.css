@@ -1,6 +1,6 @@
 html {
 	height: 100%;
-	background: black
+	background: #7C7F83
 }
 
 body {
@@ -8,11 +8,25 @@ body {
 	color: white;
 	margin: auto;
 	width: 75%;
-	color: #000000;
-	background: #CCCCCC;
+	color: #F7F8F7;
+	background: #1E191F;
 	height: 100%;
 	padding-top: 0.1em;
 }
+
+#topline {
+	border-color:#7C7F83;
+	background-color:#7C7F83;
+	background:#7C7F83;
+}
+
+/** Colormind
+	F7F8F7
+	7C7F83
+	89929B
+	7D7474
+	1E191F
+*/
 
 #headshot {
 	height: 20%;
@@ -20,19 +34,19 @@ body {
 }
 
 .link {
-	color:black;
+	color:#7D7474;
 }
 
 .link:visited {
-	color:black;
+	color:#7D7474;
 }
 
 .link:hover {
-	color:#CC0000;
+	color:#CC2424;
 }
 
 .link:active {
-	color:black;
+	color:#7D7474;
 }
 
 .icon {
