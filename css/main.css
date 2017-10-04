@@ -28,29 +28,18 @@ body {
 	1E191F
 */
 
-#intro {
+section {
 	align-content: center;
-	text-align: left;
+	text-align: center;
 	margin: auto;
 	width: 50%;
 }
 
-#introtext {
-	padding-left: 1em;
-	margin-left: 20%;
-}
-
 #headshot {
-	float: left;
 	border-radius: 10%;
 	height: 20%;
 	width: 20%;
 }
-
-.section {
-
-}
-
 
 .link {
 	color:#7D7474;
@@ -83,4 +72,15 @@ footer {
 
 .footertext {
 	line-height: 30%;
+}
+
+
+@media screen and (max-width: 481px){
+	#headshot {
+		height: 50%;
+		width: 50%;
+	}
+	.icon {
+		font-size: 40px;
+	}
 }
