@@ -74,7 +74,7 @@ body {
     text-transform: uppercase; }
   #mainNav .navbar-brand {
     color: #CC2424;
-    font-family: 'Kaushan Script', 'Helvetica Neue', Helvetica, Arial, cursive; }
+    font-family: 'Helvetica Neue', Helvetica, Arial, cursive; }
     #mainNav .navbar-brand.active, #mainNav .navbar-brand:active, #mainNav .navbar-brand:focus, #mainNav .navbar-brand:hover {
       color: #CE1010; }
   #mainNav .navbar-nav .nav-item .nav-link {
