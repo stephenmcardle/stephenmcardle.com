@@ -13,7 +13,7 @@
   }
   .navbar-brand {
     color: $theme-primary;
-    @include script-font;
+    @include body-font;
     &.active,
     &:active,
     &:focus,

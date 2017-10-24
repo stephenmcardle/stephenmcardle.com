@@ -74,7 +74,7 @@ body {
     text-transform: uppercase; }
   #mainNav .navbar-brand {
     color: #cc2424;
-    font-family: 'Kaushan Script', 'Helvetica Neue', Helvetica, Arial, cursive; }
+    font-family: 'Roboto Slab', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     #mainNav .navbar-brand.active, #mainNav .navbar-brand:active, #mainNav .navbar-brand:focus, #mainNav .navbar-brand:hover {
       color: #a11c1c; }
   #mainNav .navbar-nav .nav-item .nav-link {
