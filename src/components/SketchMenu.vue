@@ -8,39 +8,56 @@ const props = defineProps<{
   onRandom: () => void;
   onHome: () => void;
 }>();
+
+function toggle() {
+  open.value = !open.value;
+}
+function close() {
+  open.value = false;
+}
+
+function handle(fn: () => void) {
+  close();
+  fn();
+}
+
 </script>
 
 <template>
-  <div class="menu" @keydown.esc="open = false">
+  <div class="menu" @keydown.esc="close">
     <button
       class="menu-button"
       type="button"
       :aria-expanded="open"
       aria-controls="sketch-menu-panel"
-      @click="open = !open"
+      @click="toggle"
     >
-      <font-awesome-icon v-if="!open" :icon="['fa', 'bars']" />
-      <font-awesome-icon v-else :icon="['fa', 'x']" />
+      <Transition name="icon" mode="out-in">
+        <font-awesome-icon v-if="!open" :icon="['fa', 'bars']" class="icon" />
+        <font-awesome-icon v-else :icon="['fa', 'x']" class="icon" />
+      </Transition>
       <span class="sr-only">Menu</span>
     </button>
-    <div
-      v-show="open"
-      id="sketch-menu-panel"
-      class="panel"
-      role="menu"
-    >
-      <button class="item" role="menuitem" type="button" @click="onReload">
-        Reload sketch
-      </button>
+    <Transition name="panel">
+      <div
+        v-if="open"
+        id="sketch-menu-panel"
+        class="panel"
+        role="menu"
+      >
+        <button class="item" role="menuitem" type="button" @click="() => handle(onReload)">
+          Reload sketch
+        </button>
 
-      <button class="item" role="menuitem" type="button" @click="onRandom">
-        New sketch
-      </button>
+        <button class="item" role="menuitem" type="button" @click="() => handle(onRandom)">
+          New sketch
+        </button>
 
-      <button class="item" role="menuitem" type="button" @click="onHome">
-        Back home
-      </button>
-    </div>
+        <button class="item" role="menuitem" type="button" @click="onHome">
+          Back home
+        </button>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -83,20 +100,50 @@ const props = defineProps<{
   display: flex;
   flex-direction: column;
   gap: 8px;
-
-  transform-origin: top right;
-  animation: menu-in 120ms ease-out;
 }
 
-@keyframes menu-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(-4px);
+@media (max-width: 640px) {
+  .menu {
+    right: 12px;
+    left: 12px;
+
+    display: flex;
+    justify-content: flex-end;
   }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+
+  .panel {
+    width: min(520px, 95%);
   }
+}
+
+.panel-enter-active {
+  transition: opacity 140ms ease, transform 140ms ease;
+  transform-origin: top right;
+}
+
+.panel-enter-from {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.96);
+}
+
+.panel-enter-to {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.panel-leave-active {
+  transition: opacity 120ms ease, transform 120ms ease;
+  transform-origin: top right;
+}
+
+.panel-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.panel-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.96);
 }
 
 .item {
@@ -112,6 +159,35 @@ const props = defineProps<{
 
 .item:over {
   background: rgba(255, 255, 255, 0.14);
+}
+
+.icon {
+  color: white;
+  display: block;
+  font-size: 18px;
+}
+
+.icon-enter-active,
+.icon-leave-active {
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.icon-enter-from {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.8);
+}
+.icon-enter-to {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.icon-leave-from {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+.icon-leave-to {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.8);
 }
 
 .sr-only {
