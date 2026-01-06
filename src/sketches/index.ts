@@ -5,11 +5,15 @@ import { gradientShift } from "@/sketches/gradientShift";
 import { attempt } from '@/sketches/attempt';
 
 export const SKETCHES: SketchDefinition[] = [
-  // bubbles,
-  // grid,
+  bubbles,
+  grid,
   gradientShift,
-  // attempt,
+  attempt,
 ]
+
+export function defaultSketch() {
+  return gradientShift;
+}
 
 export function randomSketch() {
   return SKETCHES[Math.floor(Math.random() * SKETCHES.length)]!;

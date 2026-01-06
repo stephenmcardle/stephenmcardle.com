@@ -1,28 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import P5Sketch from "@/components/P5Sketch.vue";
-import { randomSketch } from "@/sketches";
+import { defaultSketch } from "@/sketches";
 
-const active = ref(randomSketch());
-const reloadKey = ref(0);
-
-function pickRandom() {
-  let sketch = randomSketch();
-  while (sketch.id === active.value.id) {
-    sketch = randomSketch();
-  }
-  active.value = sketch;
-  reloadKey.value++;
-}
-
-function reloadCurrent() {
-  reloadKey.value++;
-}
+const active = ref(defaultSketch());
 </script>
 
 <template>
   <P5Sketch
-    :key="reloadKey"
     :definition="active"
   >
     <div class="hero-overlay">
@@ -49,11 +34,6 @@ function reloadCurrent() {
       </div>
     </div>
   </P5Sketch>
-
-  <!-- <section class="content">
-    <h2>Content below</h2>
-    <p>Scroll works normally.</p>
-  </section> -->
 </template>
 
 <style>
