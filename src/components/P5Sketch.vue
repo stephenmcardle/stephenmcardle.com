@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch, nextTick, defineExpose, computed } from "vue";
 import p5 from "p5";
 import type { SketchDefinition, SketchContext, SketchInstance } from "@/sketches/types";
 
-const props = defineProps<{
-  definition: SketchDefinition;
-}>();
+const props = withDefaults(
+  defineProps<{
+    definition: SketchDefinition;
+    overlayAlign?: 'center' | 'none';
+  }>(),
+  { overlayAlign: 'center' }
+);
+
+const overlayClass = computed(() => 
+  props.overlayAlign === 'center' ? 'overlay-center': 'overlay-none'
+);
 
 const host = ref<HTMLDivElement | null>(null);
 let inst: p5 | null = null;
@@ -21,8 +29,7 @@ function mount() {
   if (!host.value) return;
 
   inst = new p5((p) => {
-    // Create a fresh per-mount sketch instance (private state lives inside it)
-    const activeSketch = props.definition.create();
+    activeSketch = props.definition.create();
 
     const ctx = (): SketchContext => ({
       p,
@@ -36,7 +43,7 @@ function mount() {
       if (width > 0 && height > 0) {
         p.resizeCanvas(width, height);
         p.pixelDensity(window.devicePixelRatio || 1);
-        activeSketch.windowResized?.(ctx());
+        activeSketch?.windowResized?.(ctx());
       }
     };
 
@@ -49,11 +56,11 @@ function mount() {
       p.pixelDensity(window.devicePixelRatio || 1);
       p.frameRate(60);
 
-      activeSketch.setup?.(ctx());
+      activeSketch?.setup?.(ctx());
     };
 
     p.draw = () => {
-      activeSketch.draw(ctx());
+      activeSketch?.draw(ctx());
     };
 
     p.windowResized = resize;
@@ -66,6 +73,12 @@ function unmount() {
   inst?.remove();
   inst = null;
 }
+
+function reload() {
+  unmount();
+  nextTick().then(mount);
+}
+defineExpose({ reload });
 
 onMounted(async () => {
   await nextTick();
@@ -89,7 +102,7 @@ watch(
   <section class="sketch-hero">
     <div ref="host" class="canvas-host"></div>
 
-    <div class="overlay">
+    <div class="overlay" :class="overlayClass">
       <slot />
     </div>
   </section>
@@ -102,20 +115,14 @@ watch(
   height: 100dvh;
   overflow: hidden;
   background-color: black;
-
-  /* centers overlay */
-  display: grid;
-  place-items: center;
 }
 
-/* host fills the hero, so rect != 0 */
 .canvas-host {
   position: absolute;
   inset: 0;
   overflow: hidden;
 }
 
-/* canvas fills the host */
 .canvas-host :deep(canvas) {
   display: block;
   position: absolute;
@@ -124,10 +131,20 @@ watch(
   height: 100%;
 }
 
-/* overlay above canvas */
 .overlay {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
-  text-align: center;
+  pointer-events: none;
 }
+
+.overlay :deep(*) {
+  pointer-events: auto;
+}
+
+.overlay-center {
+  display: grid;
+  place-items: center;
+}
+
 </style>

@@ -9,6 +9,7 @@ const active = ref(defaultSketch());
 <template>
   <P5Sketch
     :definition="active"
+    overlayAlign="center"
   >
     <div class="hero-overlay">
       <img class="hero-image" src="/img/self.jpg" />

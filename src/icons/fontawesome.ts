@@ -1,6 +1,8 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faSquareEnvelope,
+  faBars,
+  faX,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faGithubSquare,
@@ -10,6 +12,8 @@ import {
 
 library.add(
   faSquareEnvelope,
+  faBars,
+  faX,
   faGithubSquare,
   faInstagramSquare,
   faSquareLinkedin,
