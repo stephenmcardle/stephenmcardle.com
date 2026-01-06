@@ -1,7 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-// import {
-//   fa,
-// } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSquareEnvelope,
+} from '@fortawesome/free-solid-svg-icons';
 import {
   faGithubSquare,
   faInstagramSquare,
@@ -9,6 +9,7 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 
 library.add(
+  faSquareEnvelope,
   faGithubSquare,
   faInstagramSquare,
   faSquareLinkedin,

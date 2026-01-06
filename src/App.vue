@@ -33,13 +33,16 @@ function reloadCurrent() {
       <button class="btn" @click="reloadCurrent">New Background</button>
       <div class="social-icons">
         <a href="https://github.com/stephenmcardle">
-          <font-awesome-icon class="fa-4x icon" :icon="['fab', 'square-github']" />
+          <font-awesome-icon class="fa-3x icon" :icon="['fab', 'square-github']" />
         </a>
         <a href="https://www.linkedin.com/in/stephen-mcardle/">
-          <font-awesome-icon class="fa-4x icon" :icon="['fab', 'square-linkedin']" />
+          <font-awesome-icon class="fa-3x icon" :icon="['fab', 'square-linkedin']" />
         </a>
         <a href="https://instagram.com/generativeartworks">
-          <font-awesome-icon class="fa-4x icon" :icon="['fab', 'square-instagram']" />
+          <font-awesome-icon class="fa-3x icon" :icon="['fab', 'square-instagram']" />
+        </a>
+        <a href="mailto:stephenwmcardle@gmail.com">
+          <font-awesome-icon class="fa-3x icon" :icon="['fa', 'square-envelope']" />
         </a>
       </div>
     </div>
