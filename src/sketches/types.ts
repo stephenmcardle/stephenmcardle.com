@@ -19,6 +19,7 @@ export type SketchInstance = {
 
 export type SketchDefinition = {
   id: string;
+  name: string,
   renderer: Renderer;
   create: () => SketchInstance;
 };

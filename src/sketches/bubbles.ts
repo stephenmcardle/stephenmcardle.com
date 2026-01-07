@@ -3,6 +3,7 @@ import type { SketchDefinition, SketchInstance } from '@/sketches/types';
 
 export const bubbles: SketchDefinition = {
   id: 'bubbles',
+  name: 'Bubbles',
   renderer: 'p2d',
   create: (): SketchInstance => {
     let p!: p5;

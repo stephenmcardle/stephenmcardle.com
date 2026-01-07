@@ -3,6 +3,7 @@ import type { SketchDefinition, SketchInstance } from '@/sketches/types';
 
 export const gradientShift: SketchDefinition = {
   id: 'gradientShift',
+  name: 'Shifting Gradients',
   renderer: 'webgl',
   create: (): SketchInstance => {
     let p!: p5;
