@@ -1,28 +1,25 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import P5Sketch from '@/components/P5Sketch.vue';
-import { randomSketch } from '@/sketches';
+import { SKETCHES, getSketchById } from '@/sketches';
 import SketchMenu from '@/components/SketchMenu.vue';
 
 type P5SketchExposed = { reload: () => void };
+
+const router = useRouter();
 const sketchRef = ref<P5SketchExposed | null>(null);
-
-const active = ref(randomSketch());
-
-function pickRandom() {
-  let sketch = randomSketch();
-  while (sketch.id === active.value.id) {
-    sketch = randomSketch();
-  }
-  active.value = sketch;
-}
+const selectedId = ref(SKETCHES[0]?.id ?? '');
+const activeDefinition = computed(() => getSketchById(selectedId.value));
 
 function reloadCurrent() {
   sketchRef.value?.reload();
 }
 
-const router = useRouter();
+function selectSketch(id: string) {
+  selectedId.value = id;
+}
+
 function goHome() {
   router.push('/');
 }
@@ -31,12 +28,14 @@ function goHome() {
 <template>
   <P5Sketch
     ref="sketchRef"
-    :definition="active"
+    :definition="activeDefinition"
     overlayAlign="none"
   >
     <SketchMenu
+      :sketches="SKETCHES"
+      :selectedSketchId="selectedId"
+      :onSelectSketch="selectSketch"
       :onReload="reloadCurrent"
-      :onRandom="pickRandom"
       :onHome="goHome"
     />
   </P5Sketch>
