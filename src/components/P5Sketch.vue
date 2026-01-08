@@ -20,6 +20,8 @@ let inst: p5 | null = null;
 
 let activeSketch: SketchInstance | null = null;
 
+const loading = ref(true);
+
 function getHostSize() {
   const el = host.value!;
   return { width: el.clientWidth, height: el.clientHeight };
@@ -30,6 +32,7 @@ function mount() {
 
   inst = new p5((p) => {
     activeSketch = props.definition.create();
+    let isFirstFrame = true;
 
     const ctx = (): SketchContext => ({
       p,
@@ -61,6 +64,11 @@ function mount() {
 
     p.draw = () => {
       activeSketch?.draw(ctx());
+
+      if (isFirstFrame) {
+        isFirstFrame = false;
+        loading.value = false;
+      }
     };
 
     p.windowResized = resize;
@@ -74,9 +82,18 @@ function unmount() {
   inst = null;
 }
 
-function reload() {
+async function restart() {
+  loading.value = true;
+  await nextTick();
+  inst?.noLoop();
+
   unmount();
-  nextTick().then(mount);
+  await nextTick();
+  mount();
+}
+
+async function reload() {
+  await restart();
 }
 defineExpose({ reload });
 
@@ -90,9 +107,7 @@ onBeforeUnmount(unmount);
 watch(
   () => props.definition,
   async () => {
-    unmount();
-    await nextTick();
-    mount();
+    await restart();
   }
 );
 </script>
@@ -100,10 +115,14 @@ watch(
 
 <template>
   <section class="sketch-hero">
-    <div ref="host" class="canvas-host"></div>
+    <div ref="host" class="canvas-host">
+      <div class="overlay" :class="overlayClass">
+        <slot />
+      </div>
 
-    <div class="overlay" :class="overlayClass">
-      <slot />
+      <div v-if="loading" class="loading">
+        <div class="spinner" aria-label="Loading" />
+      </div>
     </div>
   </section>
 </template>
@@ -112,9 +131,8 @@ watch(
 .sketch-hero {
   position: relative;
   width: 100%;
-  height: 100dvh;
+  height: 100%;
   overflow: hidden;
-  background-color: black;
 }
 
 .canvas-host {
@@ -145,6 +163,34 @@ watch(
 .overlay-center {
   display: grid;
   place-items: center;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #0b0b0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 100%;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #f9f9f9;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
 }
 
 </style>
