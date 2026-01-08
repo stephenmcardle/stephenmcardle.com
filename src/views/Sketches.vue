@@ -98,12 +98,12 @@ function goHome() {
       circle at 50% 20%,
       rgba(255, 255, 255, 0.06),
       transparent 70%,
-      #0b0b0f
+      #888
     );
 }
 
 .sketch-card {
-  width: min(720px, calc(100dvw - 32px));
+  width: min(800px, calc(100dvw - 32px));
   max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
