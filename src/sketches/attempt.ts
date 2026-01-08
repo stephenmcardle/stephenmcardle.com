@@ -228,7 +228,7 @@ export const attempt: SketchDefinition = {
           } else {
             gradients.push(new Gradient(x, y, w, h, 1, numColors));
           }
-  }
+        }
       },
       draw: () => {
         p.background(bgColor);

@@ -2,8 +2,14 @@ import type { SketchDefinition } from "./types";
 import { bubbles } from "@/sketches/bubbles";
 import { gradientShift } from "@/sketches/gradientShift";
 import { attempt } from '@/sketches/attempt';
+import { patchwork } from '@/sketches/patchwork';
+import { graphite } from '@/sketches/graphite';
+import { fuzz } from '@/sketches/fuzz';
 
 export const SKETCHES: SketchDefinition[] = [
+  fuzz,
+  graphite,
+  patchwork,
   bubbles,
   gradientShift,
   attempt,
