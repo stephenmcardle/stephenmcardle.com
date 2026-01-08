@@ -78,6 +78,18 @@ function mount() {
 function unmount() {
   activeSketch?.dispose?.();
   activeSketch = null;
+
+  try {
+    const canvas = host.value?.querySelector("canvas") as HTMLCanvasElement | null;
+    const gl =
+      (canvas?.getContext("webgl2") as WebGL2RenderingContext | null) ??
+      (canvas?.getContext("webgl") as WebGLRenderingContext | null);
+
+    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+  } catch {
+    // ignore
+  }
+
   inst?.remove();
   inst = null;
 }
