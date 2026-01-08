@@ -1,14 +1,43 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { usePersistentRef } from '@/composables/usePersistentRef';
 import P5Sketch from '@/components/P5Sketch.vue';
 import { SKETCHES, getSketchById } from '@/sketches';
 import type { SketchDefinition } from '@/sketches/types';
 
+const route = useRoute();
 const router = useRouter();
+
 const reloadKey = ref(0);
-const selectedId = ref(SKETCHES[0]?.id ?? '');
-const activeDefinition = computed(() => getSketchById(selectedId.value));
+const fallbackId = SKETCHES[0]?.id ?? ''
+const selectedId = usePersistentRef<string>('selectedSketchId', fallbackId);
+
+function normalizeId(id: string) {
+  return SKETCHES.some(s => s.id === id) ? id : fallbackId;
+}
+
+const sketchIdFromQuery = typeof route.query.sketch === 'string' ? route.query.sketch : null;
+selectedId.value = normalizeId(sketchIdFromQuery || selectedId.value);
+
+watch(
+  selectedId,
+  (id) => {
+    const normalized = normalizeId(id);
+    if (normalized !== id) {
+      selectedId.value = normalized;
+      return;
+    }
+
+    router.replace({
+      query: { ...route.query, sketch: normalized,
+      },
+    });
+  },
+  { immediate: true }
+);
+
+const activeDefinition = computed(() => getSketchById(selectedId.value) ?? SKETCHES[0]);
 
 function reloadCurrent() {
   reloadKey.value++;
