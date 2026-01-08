@@ -3,21 +3,19 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import P5Sketch from '@/components/P5Sketch.vue';
 import { SKETCHES, getSketchById } from '@/sketches';
-import SketchMenu from '@/components/SketchMenu.vue';
-
-type P5SketchExposed = { reload: () => void };
+import type { SketchDefinition } from '@/sketches/types';
 
 const router = useRouter();
-const sketchRef = ref<P5SketchExposed | null>(null);
+const reloadKey = ref(0);
 const selectedId = ref(SKETCHES[0]?.id ?? '');
 const activeDefinition = computed(() => getSketchById(selectedId.value));
 
 function reloadCurrent() {
-  sketchRef.value?.reload();
+  reloadKey.value++;
 }
 
-function selectSketch(id: string) {
-  selectedId.value = id;
+function onSelectChange(e: Event) {
+  selectedId.value = (e.target as HTMLSelectElement).value;
 }
 
 function goHome() {
@@ -26,64 +24,140 @@ function goHome() {
 </script>
 
 <template>
-  <P5Sketch
-    ref="sketchRef"
-    :definition="activeDefinition"
-    overlayAlign="none"
-  >
-    <SketchMenu
-      :sketches="SKETCHES"
-      :selectedSketchId="selectedId"
-      :onSelectSketch="selectSketch"
-      :onReload="reloadCurrent"
-      :onHome="goHome"
-    />
-  </P5Sketch>
+  <main class="sketches-page">
+    <section class="sketch-card">
+      <header class="controls top">
+        <label class="label">
+          Sketch
+          <select class="select" :value="selectedId" @change="onSelectChange">
+            <option class="option" v-for="s in SKETCHES" :key="s.id" :value="s.id">
+              {{ s.name ?? s.id }}
+            </option>
+          </select>
+        </label>
+      </header>
+      <div class="stage-wrapper">
+        <div class="stage">
+          <P5Sketch :key="reloadKey" :definition="activeDefinition" overlayAlign="none" />
+        </div>
+      </div>
+      <footer class="controls bottom">
+        <button class="btn" @click="reloadCurrent">Reload</button>
+        <button class="btn" @click="goHome">Home</button>
+      </footer>
+    </section>
+  </main>
 </template>
 
 <style scoped>
-.hero-overlay {
-  width: min(720px, 92vw);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.sketches-page {
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  padding-top: calc(16px + env(safe-area-inset-top));
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(255, 255, 255, 0.06),
+      transparent 70%,
+      #0b0b0f
+    );
+}
+
+.sketch-card {
+  width: min(720px, calc(100dvw - 32px));
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
+  padding: 16px;
+  border-radius: 18px;
 
-  padding: 14px 16px;
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
 
-  backdrop-filter: blur(8px);
-  background: rgba(200, 200, 200, 0.5);
-  border-radius: 12px;
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.75);
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
 
-    margin-bottom: env(safe-area-inset-bottom);
+.stage-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.stage {
+  width: min(100%, 720px);
+  max-height: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.stage :deep(.sketch-root) {
+  width: 100%;
+  height: 100%
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.label {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  opacity: 0.95;
+}
+
+.select {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: #111;
+  outline: none;
 }
 
 .btn {
-  margin-top: 6px;
+  border: 0;
+  border-radius: 12px;
   padding: 10px 14px;
-  border-radius: 4px;
-  border: 2px solid #111;
-  background-color: rgba(0, 0, 0, 0.0);
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
   color: #111;
   box-shadow:
-    0 0 2px rgba(16, 16, 16, 0.5);
+    0 0 3px rgba(16, 16, 16, 0.5);
   display: block;
+}
+
+.primary {
+  background: rgba(255, 255, 255, 0.16);
+  font-weight: 600;
 }
 
 .btn:hover {
   box-shadow:
     0 0 3px rgba(16, 16, 16, 0.9);
-}
-
-.btn-left {
-  margin-right: 10px;
-}
-
-.primary {
-  font-weight: 600;
 }
 </style>
