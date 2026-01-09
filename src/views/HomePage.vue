@@ -20,7 +20,7 @@ onMounted(() => {
       <img class="hero-image" src="/img/self.jpg" />
       <div class="hero-content">
         <h1>Stephen McArdle</h1>
-        <p>Software Engineer</p>
+        <p>Software Engineer • Generative Artist</p>
         <a href=""><button class="btn btn-left">My Resume</button></a>
         <RouterLink to="/sketches"><button class="btn">More Sketches</button></RouterLink>
         <div class="social-icons">
