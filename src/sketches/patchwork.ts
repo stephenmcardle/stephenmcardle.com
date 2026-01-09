@@ -16,12 +16,11 @@ export const patchwork: SketchDefinition = {
   create: (): SketchInstance => {
     let p!: p5;
     let ctx2d!: CanvasRenderingContext2D;
-    let simWidth = 100;
+    const simWidth = 100;
     let simHeight = 100;
     let colors: string[];
     let minW: number, minH: number;
     let patternIndex: number;
-    const root2 = 1.4142135623730951;
     const bgRects: Rectangle[] = [];
     const patternFuncs = [drawGrid, drawMandalas, drawTesselation];
     const blocks: Block[] = [];
@@ -123,28 +122,6 @@ export const patchwork: SketchDefinition = {
         }
         p.pop();
       }
-    }
-    
-    function drawStripes() {
-      const theta = p.PI * p.random([0, .25, .5, .75]);
-      const numSets = p.floor(p.random(24, 48)) * 2;
-      const setSize = 2 * simWidth * p.random(1, root2) / numSets;
-      const numColors = getValidNumColors();
-      return () => {
-        p.push();
-        p.strokeWeight(1);
-        p.translate(simWidth / 2, simHeight / 2);
-        p.rotate(theta);
-        for (let i = 0; i < numSets; i++) {
-          const y = p.map(i, 0, numSets, -simHeight, simHeight * 2);
-          for (let j = 0; j < numColors; j++) {
-            p.stroke(colors[j]!);
-            const yOffset = setSize * j / numColors;
-            p.line(-simWidth, y + yOffset, simWidth * 2, y + yOffset);
-          }
-        }
-        p.pop();
-      };
     }
     
     function drawGrid() {
@@ -259,7 +236,7 @@ export const patchwork: SketchDefinition = {
       p.push();
       p.translate(tx, ty);
       p.beginShape();
-      for (let pt of points) {
+      for (const pt of points) {
         p.vertex(pt[0], pt[1]);
       }
       p.endShape();
@@ -279,7 +256,7 @@ export const patchwork: SketchDefinition = {
         p.shuffle(patternFuncs, true);
         p.shuffle(colors, true);
         ench(0, 0, simWidth, simHeight, bgRects);
-        for (let r of bgRects) {
+        for (const r of bgRects) {
           const path = new Path2D();
           path.rect(r.x, r.y, r.w, r.h);
           const patternFunc = getPatternFunc();
@@ -290,7 +267,7 @@ export const patchwork: SketchDefinition = {
         p.clear();
         p.push();
         p.scale(p.width / simWidth, p.height / simHeight);
-        for (let b of blocks) {
+        for (const b of blocks) {
           b.draw();
         }
         p.pop();

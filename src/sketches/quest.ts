@@ -144,7 +144,7 @@ export const quest: SketchDefinition = {
       };
       const selection = colorPalettes[p.random(Object.keys(colorPalettes))]!;
       const palette = [];
-      for (let c of selection) {
+      for (const c of selection) {
         palette.push(p.color(c));
       }
       return palette;
@@ -183,7 +183,6 @@ export const quest: SketchDefinition = {
           }
           shapes.push(shape);
         }
-        console.log(shapes);
       },
       draw: () => {
         p.background(bgColor);

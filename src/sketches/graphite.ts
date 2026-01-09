@@ -8,8 +8,8 @@ export const graphite: SketchDefinition = {
   create: (): SketchInstance => {
     let p!: p5;
     const numLines = 10000;
-    let simWidth = 100, simHeight = 100;
-    let outerPoints: p5.Vector[] = [];
+    const simWidth = 100, simHeight = 100;
+    const outerPoints: p5.Vector[] = [];
     const indices: [number, number][] = [];
     const colors: p5.Color[] = [];
 

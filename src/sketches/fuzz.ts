@@ -73,7 +73,7 @@ export const fuzz: SketchDefinition = {
     function fuzz(x = 0, y = 0, w = p.width, h = p.height, num = 140) {
       for (let i = 0; i < num; i++) {
         for (let j = 0; j < num; j++) {
-          let p0 = p.createVector(p.map(i, 0, num-2, x, x + w), p.map(j, 0, num-2, y, y + h));
+          const p0 = p.createVector(p.map(i, 0, num-2, x, x + w), p.map(j, 0, num-2, y, y + h));
     
           const size = p.map(sizeNoiseFunc(p0.x / sizeNoiseResolution, p0.y / sizeNoiseResolution), 0, 1, minSize, maxSize);
     
@@ -308,7 +308,7 @@ export const fuzz: SketchDefinition = {
       };
       const selection = colorPalettes[p.random(Object.keys(colorPalettes))]!;
       const palette = [];
-      for (let c of selection) {
+      for (const c of selection) {
         palette.push(p.color(c));
       }
       return palette;

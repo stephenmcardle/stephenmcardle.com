@@ -19,7 +19,7 @@ export const gradientShift: SketchDefinition = {
     let u_saturation: number
     let u_brightness: number;
     
-    let layers: ShiftingGradient[] = [];
+    const layers: ShiftingGradient[] = [];
 
     let oldWidth: number;
     let oldHeight: number;
@@ -50,7 +50,8 @@ export const gradientShift: SketchDefinition = {
           this.gradient = this.imgCtx.createRadialGradient(...this.coords.radialGradientArgs);
         }
         for (let i = 0; i < this.stops.length; i++) {
-          this.gradient.addColorStop(this.stops[i]!, this.colors[i % this.colors.length]?.toString()!);
+          const clr = this.colors[i % this.colors.length]!;
+          this.gradient.addColorStop(this.stops[i]!, clr.toString()!);
         }
       }
     
@@ -324,7 +325,7 @@ export const gradientShift: SketchDefinition = {
       };
       const selection = colorPalettes[p.random(Object.keys(colorPalettes))]!;
       const palette = [];
-      for (let c of selection) {
+      for (const c of selection) {
         palette.push(p.color(c));
       }
       return palette;
@@ -461,7 +462,7 @@ export const gradientShift: SketchDefinition = {
       draw: () => {
         p.clear();
         // Update gradients
-        for (let l of layers) {
+        for (const l of layers) {
           l.step(p.millis()/12);
           l.draw();
         }
@@ -479,14 +480,14 @@ export const gradientShift: SketchDefinition = {
         p.rect(0, 0, p.width, p.height);
       },
       windowResized: () => { // TODO resize properly
-        for (let l of layers) {
+        for (const l of layers) {
           l.resize();
         }
         oldWidth = p.width;
         oldHeight = p.height;
       },
       dispose: () => {
-        for (let l of layers) {
+        for (const l of layers) {
           l.img.remove();
         }
       }

@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { usePersistentRef } from '@/composables/usePersistentRef';
 import P5Sketch from '@/components/P5Sketch.vue';
 import { SKETCHES, getSketchById } from '@/sketches';
-import type { SketchDefinition } from '@/sketches/types';
 
 const route = useRoute();
 const router = useRouter();
