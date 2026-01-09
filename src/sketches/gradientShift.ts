@@ -75,7 +75,7 @@ export const gradientShift: SketchDefinition = {
             amt = 1 / this.colors.length * p.random(-.01, .01);
             check = this.stops[i]! + amt;
           }
-          this.stops[i] += amt;
+          this.stops[i]! += amt;
         }
       }
     

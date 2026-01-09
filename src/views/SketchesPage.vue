@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { usePersistentRef } from '@/composables/usePersistentRef';
 import P5Sketch from '@/components/P5Sketch.vue';
 import { SKETCHES, getSketchById } from '@/sketches';
+import type { SketchDefinition } from '@/sketches/types';
 
 const route = useRoute();
 const router = useRouter();
@@ -20,7 +21,7 @@ const sketchIdFromQuery = typeof route.query.sketch === 'string' ? route.query.s
 selectedId.value = normalizeId(sketchIdFromQuery || selectedId.value);
 
 watch(
-  selectedId,
+  () => selectedId.value,
   (id) => {
     const normalized = normalizeId(id);
     if (normalized !== id) {
@@ -36,7 +37,11 @@ watch(
   { immediate: true }
 );
 
-const activeDefinition = computed(() => getSketchById(selectedId.value) ?? SKETCHES[0]);
+if (SKETCHES.length === 0) {
+  throw new Error('No sketches registered in SKETCHES.');
+}
+const fallbackDefinition: SketchDefinition = SKETCHES[0]!;
+const activeDefinition = computed(() => getSketchById(selectedId.value) ?? fallbackDefinition);
 
 function reloadCurrent() {
   reloadKey.value++;

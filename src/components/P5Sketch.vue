@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick, defineExpose, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from "vue";
 import p5 from "p5";
 import type { SketchDefinition, SketchContext, SketchInstance } from "@/sketches/types";
 
