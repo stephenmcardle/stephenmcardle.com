@@ -15,7 +15,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  base: 'https://stephenmcardle.github.io/personal-website/',
+  base: '/personal-website/',
   build: {
     rollupOptions: {
       output: {
