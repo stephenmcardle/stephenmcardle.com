@@ -72,7 +72,7 @@ export const lavaSmooth: SketchDefinition = {
         color = mix(color, u_color1, 1.0 - abs(nv - 0.2));
         color = mix(color, u_color2, 1.0 - abs(nv - 0.4));
         
-        float nv1 = noiseFunc(vec3(st.yx, u_time / 8.0));
+        float nv1 = noiseFunc(vec3(st.yx * 4.0, u_time / 8.0));
         color = mix(color, u_color3, 1.0 - abs(nv1 - 0.6));
         color = mix(color, u_color4, 1.0 - abs(nv1 - 0.8));
         color = mix(color, u_color5, 1.0 - abs(nv1 - 1.0));
