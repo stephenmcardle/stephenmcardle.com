@@ -42,6 +42,7 @@ export const lava: SketchDefinition = {
       const easingFunc = getEasingFunc();
       const noiseFunc = getNoiseFunc();
       const modValue = p.random(0.5, 1.5);
+      const noiseCoordMult = p.random(['8.0', '12.0', '16.0']);
       return `
       #ifdef GL_ES
       precision mediump float;
@@ -67,7 +68,7 @@ export const lava: SketchDefinition = {
       void main() {
         vec2 st = gl_FragCoord.xy/u_resolution.xy;
       
-        float nv = mod(noiseFunc(vec3(st.xy * 12.0, u_time / 4.0)), ${modValue});
+        float nv = mod(noiseFunc(vec3(st.xy * ${noiseCoordMult}, u_time / 4.0)), ${modValue});
     
         vec3 color = u_color0 * (1.0 - nv);
         color = mix(color, u_color1 * (1.0 - abs(nv - 0.2)), 1.0);
@@ -76,7 +77,7 @@ export const lava: SketchDefinition = {
         color = mix(color, u_color4 * (1.0 - abs(nv - 0.8)), 1.0);
         color = mix(color, u_color5 * (1.0 - abs(nv - 1.0)), 1.0);
     
-        gl_FragColor = vec4(color, 1.0);
+        gl_FragColor = vec4(vec3(0.9) - color, 1.0);
       }
       `;
     }
