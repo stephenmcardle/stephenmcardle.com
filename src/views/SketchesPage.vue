@@ -64,7 +64,7 @@ function goHome() {
           Sketch
           <select class="select" :value="selectedId" @change="onSelectChange">
             <option class="option" v-for="s in SKETCHES" :key="s.id" :value="s.id">
-              {{ s.name ?? s.id }}
+              {{ s.name ?? s.id }} ({{ s.renderer }})
             </option>
           </select>
         </label>
