@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from "vue";
-import p5 from "p5";
 import type { SketchDefinition, SketchContext, SketchInstance } from "@/sketches/types";
+
+type P5Constructor = typeof import('p5').default;
+let P5: P5Constructor | null = null;
+
+async function getP5(): Promise<P5Constructor> {
+  if (P5) return P5;
+  const mod = await import('p5');
+  P5 = mod.default;
+  return P5;
+}
 
 const props = withDefaults(
   defineProps<{
@@ -16,7 +25,7 @@ const overlayClass = computed(() =>
 );
 
 const host = ref<HTMLDivElement | null>(null);
-let inst: p5 | null = null;
+let inst: InstanceType<P5Constructor> | null = null;
 
 let activeSketch: SketchInstance | null = null;
 
@@ -27,8 +36,13 @@ function getHostSize() {
   return { width: el.clientWidth, height: el.clientHeight };
 }
 
-function mount() {
+async function mount() {
   if (!host.value) return;
+
+  loading.value = true;
+  await nextTick();
+
+  const p5 = await getP5();
 
   inst = new p5((p) => {
     activeSketch = props.definition.create();
@@ -98,10 +112,9 @@ async function restart() {
   loading.value = true;
   await nextTick();
   inst?.noLoop();
-
   unmount();
   await nextTick();
-  mount();
+  await mount();
 }
 
 async function reload() {

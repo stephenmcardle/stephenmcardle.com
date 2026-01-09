@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import P5Sketch from "@/components/P5Sketch.vue";
 import { defaultSketch } from "@/sketches";
 
 const active = ref(defaultSketch());
+
+onMounted(() => {
+  import('@/views/SketchesPage.vue');
+});
+
 </script>
 
 <template>

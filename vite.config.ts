@@ -15,4 +15,19 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-})
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          p5: ['p5'],
+          fa: [
+            "@fortawesome/fontawesome-svg-core",
+            "@fortawesome/vue-fontawesome",
+            "@fortawesome/free-solid-svg-icons",
+            "@fortawesome/free-brands-svg-icons",
+          ],
+        },
+      },
+    },
+  },
+});
