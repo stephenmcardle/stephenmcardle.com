@@ -11,7 +11,7 @@ export const graphite: SketchDefinition = {
     let simWidth = 100, simHeight = 100;
     let outerPoints: p5.Vector[] = [];
     const indices: [number, number][] = [];
-    const colors: p5.Color[] = []; // TODO use correct type
+    const colors: p5.Color[] = [];
 
     return {
       setup: (ctx) => {

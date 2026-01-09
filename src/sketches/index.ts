@@ -1,6 +1,7 @@
-import type { SketchDefinition } from "./types";
-import { bubbles } from "@/sketches/bubbles";
-import { gradientShift } from "@/sketches/gradientShift";
+import type { SketchDefinition } from './types';
+import { bubbles } from '@/sketches/bubbles';
+import { homeGradientShift } from '@/sketches/homeGradientShift';
+import { gradientShift } from '@/sketches/gradientShift';
 import { attempt } from '@/sketches/attempt';
 import { patchwork } from '@/sketches/patchwork';
 import { graphite } from '@/sketches/graphite';
@@ -16,7 +17,7 @@ export const SKETCHES: SketchDefinition[] = [
 ]
 
 export function defaultSketch() {
-  return gradientShift;
+  return homeGradientShift;
 }
 
 export function getSketchById(id: string) {

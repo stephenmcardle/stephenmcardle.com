@@ -15,6 +15,7 @@ export const patchwork: SketchDefinition = {
   renderer: 'p2d',
   create: (): SketchInstance => {
     let p!: p5;
+    let ctx2d!: CanvasRenderingContext2D;
     let simWidth = 100;
     let simHeight = 100;
     let colors: string[];
@@ -22,8 +23,7 @@ export const patchwork: SketchDefinition = {
     let patternIndex: number;
     const root2 = 1.4142135623730951;
     const bgRects: Rectangle[] = [];
-    const patternFuncs = [drawGrid, drawMandalas, drawTesselation, drawStripes]; 
-    // const patternFuncs = [drawMandalas];
+    const patternFuncs = [drawGrid, drawMandalas, drawTesselation];
     const blocks: Block[] = [];
 
     class Block {
@@ -38,11 +38,11 @@ export const patchwork: SketchDefinition = {
       }
 
       draw() {
-        p.drawingContext.save();
-        p.drawingContext.clip(this.clipPath);
+        ctx2d.save();
+        ctx2d.clip(this.clipPath);
         p.background(this.bgColor);
         this.patternFunc();
-        p.drawingContext.restore();
+        ctx2d.restore();
       }
     }
 
@@ -81,7 +81,6 @@ export const patchwork: SketchDefinition = {
       const types: number[] = [];
       for (let i = 0; i < numSubShapes; i++) {
         const type = p.random([0, 1]);
-        // const type = 1;
         types.push(type);
         if (type === 0) {
           numShapesPerSubShape.push(1);
@@ -270,6 +269,7 @@ export const patchwork: SketchDefinition = {
     return {
       setup: (ctx) => {
         p = ctx.p;
+        ctx2d = p.drawingContext as CanvasRenderingContext2D;
         simHeight = simWidth * (p.height / p.width);
         colors = p.random(palettes);
         p.noStroke();
@@ -296,9 +296,6 @@ export const patchwork: SketchDefinition = {
         p.pop();
         p.noLoop();
       },
-      windowResized: () => {
-        p.loop();
-      }
     }
   }
 };

@@ -1,34 +1,45 @@
 import type p5 from 'p5';
 import type { SketchDefinition, SketchInstance } from '@/sketches/types';
 
+type ColorPalettesObject = Record<string, string[]>;
+
 export const attempt: SketchDefinition = {
   id: 'attempt',
   name: 'Groove',
   renderer: 'p2d',
   create: (): SketchInstance => {
     let p!: p5;
-    let palette, bgColor;
-    let oldWidth, oldHeight;
-    const gradients = [];
+    let ctx2d!: CanvasRenderingContext2D;
+    let palette: p5.Color[] = [];
+    let bgColor: p5.Color;
+    let oldWidth: number, oldHeight: number;
+    const gradients: Gradient[] = [];
 
     class Gradient {
-      constructor(x, y, w, h, type, numColors) {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      type: number;
+      xSpeed = p.random();
+      ySpeed = p.random();
+      xDirection = p.random([-1, 1]);
+      yDirection = p.random([-1, 1]);
+      colors: p5.Color[] = [];
+      gradient: CanvasGradient;
+
+      constructor(x: number, y: number, w: number, h: number, type: number, numColors: number) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        this.xSpeed = p.random();
-        this.ySpeed = p.random();
-        this.xDirection = p.random([-1, 1]);
-        this.yDirection = p.random([-1, 1]);
         this.type = type;
-        this.colors = [];
         for (let i = 0; i < numColors; i++) {
           this.colors.push(getRandomColor(this.colors));
         }
-        this.gradient = p.drawingContext.createLinearGradient(x, y, x + w, y + h);
+        this.gradient = ctx2d.createLinearGradient(x, y, x + w, y + h);
         for (let i = 0; i < this.colors.length; i++) {
-          this.gradient.addColorStop(i / numColors, this.colors[i]);
+          this.gradient.addColorStop(i / numColors, this.colors[i]!.toString());
         }
         if (this.type === 1) {
           if (this.w < 0) {
@@ -43,10 +54,10 @@ export const attempt: SketchDefinition = {
       }
 
       step(amt = 0) {
-        const f = amt / 10;
+        const f = amt / 50;
         this.x += f * this.xSpeed * this.xDirection;
         this.y += f * this.ySpeed * this.yDirection;
-        if (this.x < -this.w/2 || this.x > p.width + this.w/2) { // TODO figure these out to keep shapes on screen
+        if (this.x < -this.w/2 || this.x > p.width + this.w/2) {
           this.xDirection *= -1;
         }
         if (this.y < -this.h/2 || this.y > p.height + this.h/2) {
@@ -56,7 +67,7 @@ export const attempt: SketchDefinition = {
     
       draw() {
         p.push();
-        p.drawingContext.fillStyle = this.gradient;
+        ctx2d.fillStyle = this.gradient;
         if (this.type === 0) {
           p.rect(this.x, this.y, this.w, this.h, p.width / 64);
         } else if (this.type === 1) {
@@ -75,7 +86,7 @@ export const attempt: SketchDefinition = {
       }
     }
     
-    function getRandomColor(otherColors) {
+    function getRandomColor(otherColors: p5.Color[]) {
       let clr = p.random(palette);
       while (otherColors.includes(clr)) {
         clr = p.random(palette);
@@ -84,7 +95,7 @@ export const attempt: SketchDefinition = {
     }
     
     function setColorPalette() {
-      const colorPalettes = {
+      const colorPalettes: ColorPalettesObject = {
         ACID: [
           '#820263',
           '#D90368',
@@ -142,20 +153,6 @@ export const attempt: SketchDefinition = {
           '#FFC914',
           '#76B041',
         ],
-        PLAID_COUCH_FROM_70S: [
-          '#FFCB47',
-          '#A1770D',
-          '#F0BB37',
-          '#967B36',
-          '#BD8802',
-        ],
-        THIN_JAMES: [
-          '#40191D',
-          '#E66A78',
-          '#82333C',
-          '#CC7680',
-          '#8A0F1D',
-        ],
         MERCIA: [
           '#D41c1c',
           '#DDFFDD',
@@ -168,13 +165,6 @@ export const attempt: SketchDefinition = {
           '#0ACDFF',
           '#60AB9A',
           '#A17AB8',
-        ],
-        MOSS_AGATE: [
-          '#F5FBEF',
-          '#92AD94',
-          '#748B75',
-          '#503D42',
-          '#C6EF80',
         ],
         FIREWATER: [
           '#F0A202',
@@ -190,18 +180,17 @@ export const attempt: SketchDefinition = {
           '#47C4AD',
           '#9DA3A1',
         ],
-        FANTASTIC_THREE: [p.color('#2466A3'), p.color('#67F665'), p.color('#B454B6')]
       };
       const paletteName = p.random(Object.keys(colorPalettes));
-      palette = colorPalettes[paletteName];
-      bgColor = p.random(palette);
-      for (let i = 0; i < palette.length; i++) {
-        let c = p.color(palette[i]);
+      const selected = colorPalettes[paletteName]!;
+      bgColor = p.color(p.random(selected));
+      for (let i = 0; i < selected.length; i++) {
+        let c = p.color(selected[i]!);
         let r = p.red(c);
         let g = p.green(c);
         let b = p.blue(c);
         c = p.color(r, g, b, 30);
-        palette[i] = c;
+        palette.push(c);
       }
     }
 
@@ -209,19 +198,33 @@ export const attempt: SketchDefinition = {
     return {
       setup: (ctx) => {
         p = ctx.p;
+        ctx2d = p.drawingContext as CanvasRenderingContext2D;
         oldWidth = p.width;
         oldHeight = p.height;
         setColorPalette();
         p.noStroke();
         p.ellipseMode(p.CORNER);
 
-        const numGradients = p.round(p.random(50, 100));
+        const numGradients = p.round(p.random(32, 48));
+        console.log(numGradients)
         const sd = p.min(p.width, p.height);
         for (let i = 0; i < numGradients; i++) {
-          const x = sd * p.random(-.25, 1.25);
-          const y = sd * p.random(-.25, 1.25);
-          const w = p.abs(p.random(-p.abs(x), sd - p.abs(x)));
-          const h = p.abs(p.random(-p.abs(y), sd - p.abs(y)));
+          let x = sd * p.random(-.25, 1.25);
+          let y = sd * p.random(-.25, 1.25);
+          const w = p.width * p.random(.1, .4) * p.random([-1, 1]);
+          const h = w * p.random(.6, 1.4) * p.random([-1, 1]);
+          if (x + w < 0) {
+            x = 1;
+          }
+          if (x - w > p.width) {
+            x = p.width - 1;
+          }
+          if (y + h < 0) {
+            y = 1;
+          }
+          if (y - h > p.height) {
+            y = p.height - 1;
+          }
           const numColors = p.floor(p.random(p.min(palette.length, 3), palette.length - .00001));
           if (p.random() < 0.33) {
             gradients.push(new Gradient(x, y, w, h, 0, numColors));
@@ -237,11 +240,6 @@ export const attempt: SketchDefinition = {
           g.step(p.deltaTime);
         }
       },
-      windowResized: () => {
-        gradients.forEach((g) => g.resize());
-        oldWidth = p.width;
-        oldHeight = p.height;
-      }
     }
   }
 }
