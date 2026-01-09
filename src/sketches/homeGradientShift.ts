@@ -6,7 +6,7 @@ type LinearGradientArgs = [number, number, number, number];
 type RadialGradientArgs = [number, number, number, number, number, number];
 
 export const homeGradientShift: SketchDefinition = {
-  id: 'homeGradientShift',
+  id: 'shifting-gradients-home',
   name: 'Shifting Gradients',
   renderer: 'webgl',
   create: (): SketchInstance => {
