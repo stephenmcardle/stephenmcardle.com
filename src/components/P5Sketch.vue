@@ -16,8 +16,12 @@ const props = withDefaults(
   defineProps<{
     definition: SketchDefinition;
     overlayAlign?: 'center' | 'none';
+    showLoadingOverlay?: boolean;
   }>(),
-  { overlayAlign: 'center' }
+  {
+    overlayAlign: 'center',
+    showLoadingOverlay: true,
+  }
 );
 
 const overlayClass = computed(() => 
@@ -29,7 +33,16 @@ let inst: InstanceType<P5Constructor> | null = null;
 
 let activeSketch: SketchInstance | null = null;
 
+const emit = defineEmits<{
+  (e: 'loading-change', value: boolean): void;
+}>();
+
 const loading = ref(true);
+
+function setLoading(v: boolean) {
+  loading.value = v;
+  emit('loading-change', v);
+}
 
 function getHostSize() {
   const el = host.value!;
@@ -39,7 +52,7 @@ function getHostSize() {
 async function mount() {
   if (!host.value) return;
 
-  loading.value = true;
+  setLoading(true);
   await nextTick();
 
   const p5 = await getP5();
@@ -81,7 +94,7 @@ async function mount() {
 
       if (isFirstFrame) {
         isFirstFrame = false;
-        loading.value = false;
+        setLoading(false);
       }
     };
 
@@ -109,7 +122,7 @@ function unmount() {
 }
 
 async function restart() {
-  loading.value = true;
+  setLoading(true);
   await nextTick();
   inst?.noLoop();
   unmount();
@@ -145,7 +158,7 @@ watch(
         <slot />
       </div>
 
-      <div v-if="loading" class="loading">
+      <div v-if="props.showLoadingOverlay && loading" class="loading">
         <div class="spinner" aria-label="Loading" />
       </div>
     </div>
@@ -164,6 +177,7 @@ watch(
   position: absolute;
   inset: 0;
   overflow: hidden;
+  z-index: 0;
 }
 
 .canvas-host :deep(canvas) {
@@ -177,7 +191,7 @@ watch(
 .overlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
 }
 
@@ -193,7 +207,7 @@ watch(
 .loading {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 1;
   background: #0b0b0f;
   display: flex;
   align-items: center;
