@@ -9,18 +9,20 @@ export const lava: SketchDefinition = {
     let p!: p5;
     let theShader: p5.Shader;
     let colorPalette: number[][];
+    let pg: p5.Graphics;
+    const simSize = 720;
 
     function initializeShader() {
       const vertexShader = getVertexShader();
       const fragmentShader = getFragmentShader();
     
-      theShader = p.createShader(vertexShader, fragmentShader);
+      theShader = pg.createShader(vertexShader, fragmentShader);
     }
     
     function getVertexShader() {
       return `
       #ifdef GL_ES
-      precision mediump float;
+      precision highp float;
       #endif
       
       attribute vec3 aPosition;
@@ -42,10 +44,10 @@ export const lava: SketchDefinition = {
       const easingFunc = getEasingFunc();
       const noiseFunc = getNoiseFunc();
       const modValue = p.random(0.5, 1.5);
-      const noiseCoordMult = p.random(['8.0', '12.0', '16.0']);
+      const noiseCoordMult = p.random([8, 12, 16]).toString() + '.0';
       return `
       #ifdef GL_ES
-      precision mediump float;
+      precision highp float;
       #endif
       
       #define PI 3.14159265359
@@ -66,9 +68,13 @@ export const lava: SketchDefinition = {
       ${noiseFunc}
       
       void main() {
-        vec2 st = gl_FragCoord.xy/u_resolution.xy;
+        vec2 uv = vTexCoord;
+        vec2 centered = uv - 0.5;
+
+        float m = min(u_resolution.x, u_resolution.y);
+        vec2 p = centered * (u_resolution.xy / m);
       
-        float nv = mod(noiseFunc(vec3(st.xy * ${noiseCoordMult}, u_time / 4.0)), ${modValue});
+        float nv = mod(noiseFunc(vec3(p * ${noiseCoordMult}, u_time / 4.0)), ${modValue});
     
         vec3 color = u_color0 * (1.0 - nv);
         color = mix(color, u_color1 * (1.0 - abs(nv - 0.2)), 1.0);
@@ -142,6 +148,9 @@ export const lava: SketchDefinition = {
     }
     
     function getBaseNoiseFunc() {
+      //  Noise functions from Brian Sharpe
+      //	http://briansharpe.wordpress.com
+      //	https://github.com/BrianSharpe
       const noiseUtils = getNoiseUtils();
       return `
       ${noiseUtils}
@@ -377,18 +386,24 @@ export const lava: SketchDefinition = {
     return {
       setup: (ctx) => {
         p = ctx.p;
+        pg = p.createGraphics(simSize, simSize, p.WEBGL);
+        pg.pixelDensity(1);
         initializeShader();
         colorPalette = getColorPalette();
         p.noStroke();
       },
       draw: () => {
+        pg.shader(theShader);
         for (let i = 0; i < colorPalette.length; i++) {
           theShader.setUniform(`u_color${i}`, colorPalette[i]!);
         }
-        theShader.setUniform('u_resolution', [p.width, p.height]);
+        const d = p.pixelDensity();
+        theShader.setUniform('u_resolution', [p.width * d, p.height * d]);
         theShader.setUniform('u_time', p.millis() / 1000);
-        p.shader(theShader);
-        p.rect(0, 0, p.width, p.height);
+        pg.rect(0, 0, pg.width, pg.height);
+
+        p.resetShader();
+        p.image(pg, -p.width/2, -p.height/2, p.width, p.height);
       },
     }
   }
