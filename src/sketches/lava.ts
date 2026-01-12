@@ -10,7 +10,7 @@ export const lava: SketchDefinition = {
     let theShader: p5.Shader;
     let colorPalette: number[][];
     let pg: p5.Graphics;
-    const simSize = 720;
+    const simSize = 1080;
 
     function initializeShader() {
       const vertexShader = getVertexShader();
@@ -397,8 +397,8 @@ export const lava: SketchDefinition = {
         for (let i = 0; i < colorPalette.length; i++) {
           theShader.setUniform(`u_color${i}`, colorPalette[i]!);
         }
-        const d = p.pixelDensity();
-        theShader.setUniform('u_resolution', [p.width * d, p.height * d]);
+        const d = pg.pixelDensity();
+        theShader.setUniform('u_resolution', [pg.width * d, pg.height * d]);
         theShader.setUniform('u_time', p.millis() / 1000);
         pg.rect(0, 0, pg.width, pg.height);
 

@@ -11,6 +11,7 @@ export const gradientShift: SketchDefinition = {
   renderer: 'webgl',
   create: (): SketchInstance => {
     let p!: p5;
+    let pg: p5.Graphics;
     let theShader: p5.Shader;
     
     let palette: p5.Color[];
@@ -21,8 +22,7 @@ export const gradientShift: SketchDefinition = {
     
     const layers: ShiftingGradient[] = [];
 
-    let oldWidth: number;
-    let oldHeight: number;
+    const simSize = 1080;
     const durations = [5000, 10000];
    
     class ShiftingGradient {
@@ -32,7 +32,7 @@ export const gradientShift: SketchDefinition = {
       coords = new Coordinates(this.type);
       colorUpdateDuration = p.random(durations);
       stops: number[] = [];
-      img = p.createGraphics(p.width, p.height);
+      img = p.createGraphics(simSize, simSize);
       imgCtx: CanvasRenderingContext2D;
       gradient: CanvasGradient | null = null;
       constructor() {
@@ -40,6 +40,7 @@ export const gradientShift: SketchDefinition = {
         for (let i = 0; i <= this.colors.length * 2; i++) {
           this.stops.push(i / this.colors.length / 2);
         }
+        this.img.pixelDensity(1);
         this.step(0);
       }
     
@@ -99,17 +100,7 @@ export const gradientShift: SketchDefinition = {
       draw() {
         this.img.clear();
         this.imgCtx.fillStyle = this.gradient!;
-        this.imgCtx.fillRect(0, 0, p.width, p.height);
-      }
-
-      resize() {
-        const pg = p.createGraphics(p.width, p.height);
-        const oldPg = this.img;
-        this.img = pg;
-        this.imgCtx = this.img.drawingContext as CanvasRenderingContext2D;
-        this.coords.resize();
-        this.draw();
-        oldPg.remove();
+        this.imgCtx.fillRect(0, 0, simSize, simSize);
       }
     }
 
@@ -142,7 +133,7 @@ export const gradientShift: SketchDefinition = {
       radialGradientArgs: RadialGradientArgs = [0, 0, 0, 0, 0, 0];
 
       constructor(type: number) {
-        const dim = p.min(p.width, p.height);
+        const dim = simSize;
         this.type = type;
         
         this.maxXShift = this.maxXShiftFactor * dim;
@@ -188,17 +179,6 @@ export const gradientShift: SketchDefinition = {
         const yShift = p.cos((elapsedTime + this.positionOffset) / this.positionDuration) * this.maxYShift * this.yDir;
         const rShift = p.sin((elapsedTime + this.radiusOffset) / this.radiusDuration) * this.maxRShift * this.radiusDir;
         this.setArgs(xShift, yShift, rShift);
-      }
-
-      resize() {
-        const dim = p.min(p.width, p.height);
-        this.maxXShift = this.maxXShiftFactor * dim;
-        this.maxYShift = this.maxYShiftFactor * dim;
-        this.maxRShift = this.maxRShiftFactor * (dim / 2);
-        this.x0 *= p.width / oldWidth;
-        this.x1 *= p.width / oldWidth;
-        this.y0 *= p.height / oldHeight;
-        this.y1 *= p.height / oldHeight;
       }
     }
 
@@ -353,7 +333,7 @@ export const gradientShift: SketchDefinition = {
     
     const fragSrc = `
     #ifdef GL_ES
-    precision mediump float;
+    precision highp float;
     #endif
     
     #define PI 3.1415
@@ -413,9 +393,6 @@ export const gradientShift: SketchDefinition = {
     }
     
     void main() {
-      vec2 fragCoord = gl_FragCoord.xy;
-      vec2 st = fragCoord / u_resolution;
-
       vec4 clr0 = texture2D(tex0, vTexCoord);
       vec4 clr1 = texture2D(tex1, vTexCoord);
       vec4 clr2 = texture2D(tex2, vTexCoord);
@@ -447,17 +424,16 @@ export const gradientShift: SketchDefinition = {
     return {
       setup: (ctx) => {
         p = ctx.p;
-        oldWidth = p.width;
-        oldHeight = p.height;
+        pg = p.createGraphics(simSize, simSize, p.WEBGL);
+        pg.pixelDensity(1);
         setupColors();
-        p.smooth();
         const numGradients = p.random([6, 8]);
         for (let i = 0; i < numGradients; i++) {
           const sg = new ShiftingGradient();
           sg.step(0);
           layers.push(sg);
         }
-        theShader = p.createShader(vertSrc, fragSrc);
+        theShader = pg.createShader(vertSrc, fragSrc);
       },
       draw: () => {
         p.clear();
@@ -468,23 +444,19 @@ export const gradientShift: SketchDefinition = {
         }
 
         // Render
-        p.background(bgColor);
+        pg.shader(theShader);
         for (let i = 0; i < layers.length; i++) {
           theShader.setUniform(`tex${i}`, layers[i]!.img);
         }
         theShader.setUniform('u_hueRotation', u_hueRotation);
         theShader.setUniform('u_saturation', u_saturation);
         theShader.setUniform('u_brightness', u_brightness);
-        theShader.setUniform('u_resolution', [p.width, p.height]);
-        p.shader(theShader);
-        p.rect(0, 0, p.width, p.height);
-      },
-      windowResized: () => { // TODO resize properly
-        for (const l of layers) {
-          l.resize();
-        }
-        oldWidth = p.width;
-        oldHeight = p.height;
+        const d = pg.pixelDensity();
+        theShader.setUniform('u_resolution', [pg.width * d, pg.height * d]);
+        pg.rect(0, 0, pg.width, pg.height);
+
+        p.resetShader();
+        p.image(pg, -p.width/2, -p.height/2, p.width, p.height);
       },
       dispose: () => {
         for (const l of layers) {

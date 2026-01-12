@@ -28,12 +28,12 @@ export const homeGradientShift: SketchDefinition = {
     
     const layers: ShiftingGradient[] = [];
 
-    let oldWidth: number;
-    let oldHeight: number;
+    const simSize = 1080;
     const durations = [5000, 10000];
 
     function getNewFramebuffer() {
-      const fb = p.createFramebuffer({ width: p.width, height: p.height });
+      const fb = p.createFramebuffer({ width: simSize, height: simSize });
+      fb.pixelDensity(1);
       fb.begin();
       p.background(0);
       fb.end();
@@ -47,10 +47,11 @@ export const homeGradientShift: SketchDefinition = {
       coords = new Coordinates(this.type);
       colorUpdateDuration = p.random(durations);
       stops: number[] = [];
-      img = p.createGraphics(p.width, p.height);
+      img = p.createGraphics(simSize, simSize);
       imgCtx: CanvasRenderingContext2D;
       gradient: CanvasGradient | null = null;
       constructor() {
+        this.img.pixelDensity(1);
         this.imgCtx = this.img.drawingContext as CanvasRenderingContext2D;
         for (let i = 0; i <= this.colors.length * 2; i++) {
           this.stops.push(i / this.colors.length / 2);
@@ -114,18 +115,8 @@ export const homeGradientShift: SketchDefinition = {
       draw() {
         this.img.clear();
         this.imgCtx.fillStyle = this.gradient!;
-        this.imgCtx.fillRect(0, 0, p.width, p.height);
+        this.imgCtx.fillRect(0, 0, simSize, simSize);
         return this.img;
-      }
-
-      resize() {
-        const pg = p.createGraphics(p.width, p.height);
-        const oldPg = this.img;
-        this.img = pg;
-        this.imgCtx = this.img.drawingContext as CanvasRenderingContext2D;
-        this.coords.resize();
-        this.draw();
-        oldPg.remove();
       }
     }
 
@@ -158,7 +149,7 @@ export const homeGradientShift: SketchDefinition = {
       radialGradientArgs: RadialGradientArgs = [0, 0, 0, 0, 0, 0];
 
       constructor(type: number) {
-        const dim = p.min(p.width, p.height);
+        const dim = simSize;
         this.type = type;
         
         this.maxXShift = this.maxXShiftFactor * dim;
@@ -204,17 +195,6 @@ export const homeGradientShift: SketchDefinition = {
         const yShift = p.cos((elapsedTime + this.positionOffset) / this.positionDuration) * this.maxYShift * this.yDir;
         const rShift = p.sin((elapsedTime + this.radiusOffset) / this.radiusDuration) * this.maxRShift * this.radiusDir;
         this.setArgs(xShift, yShift, rShift);
-      }
-
-      resize() {
-        const dim = p.min(p.width, p.height);
-        this.maxXShift = this.maxXShiftFactor * dim;
-        this.maxYShift = this.maxYShiftFactor * dim;
-        this.maxRShift = this.maxRShiftFactor * (dim / 2);
-        this.x0 *= p.width / oldWidth;
-        this.x1 *= p.width / oldWidth;
-        this.y0 *= p.height / oldHeight;
-        this.y1 *= p.height / oldHeight;
       }
     }
 
@@ -369,7 +349,7 @@ export const homeGradientShift: SketchDefinition = {
     
     const bgImgFragSrc = `
     #ifdef GL_ES
-    precision mediump float;
+    precision highp float;
     #endif
     
     #define PI 3.1415
@@ -635,8 +615,7 @@ export const homeGradientShift: SketchDefinition = {
     return {
       setup: (ctx) => {
         p = ctx.p;
-        oldWidth = p.width;
-        oldHeight = p.height;
+        p.randomSeed(998);
         setupColors();
         p.smooth();
         for (let i = 0; i < 8; i++) {
@@ -644,7 +623,8 @@ export const homeGradientShift: SketchDefinition = {
           sg.step(0);
           layers.push(sg);
         }
-        bgImg = p.createGraphics(p.width, p.height, p.WEBGL);
+        bgImg = p.createGraphics(simSize, simSize, p.WEBGL);
+        bgImg.pixelDensity(1);
         bgImgShader = bgImg.createShader(vertSrc, bgImgFragSrc);
 
         sim0 = getNewFramebuffer();
@@ -665,16 +645,16 @@ export const homeGradientShift: SketchDefinition = {
         }
 
         // Image pass
-        bgImg.background(bgColor);
+        bgImg.shader(bgImgShader);
         for (let i = 0; i < layers.length; i++) {
           bgImgShader.setUniform(`tex${i}`, layers[i]!.img);
         }
         bgImgShader.setUniform('u_hueRotation', u_hueRotation);
         bgImgShader.setUniform('u_saturation', u_saturation);
         bgImgShader.setUniform('u_brightness', u_brightness);
-        bgImgShader.setUniform('u_resolution', [p.width, p.height]);
-        bgImg.shader(bgImgShader);
-        bgImg.rect(0, 0, p.width, p.height);
+        const bgImgD = bgImg.pixelDensity();
+        bgImgShader.setUniform('u_resolution', [bgImg.width * bgImgD, bgImg.height * bgImgD]);
+        bgImg.rect(0, 0, bgImg.width, bgImg.height);
 
 
         // Sim pass
@@ -682,12 +662,14 @@ export const homeGradientShift: SketchDefinition = {
         sim1.begin();
         p.shader(bufferShader);
         bufferShader.setUniform('u_prev', sim0);
-        bufferShader.setUniform('u_resolution', [p.width, p.height]);
+        bufferShader.setUniform('u_resolution', [simSize, simSize]);
         bufferShader.setUniform('u_frame', p.frameCount - 1);
         bufferShader.setUniform('u_delta', 1.4);
-        bufferShader.setUniform('u_mouse', [p.mouseX, p.mouseY, isMousePressed, 0.0]);
+        const mx = (p.mouseX / p.width) * simSize;
+        const my = (p.mouseY / p.height) * simSize;
+        bufferShader.setUniform('u_mouse', [mx, my, isMousePressed, 0.0]);
         bufferShader.setUniform('u_dt', p.deltaTime / 1000);
-        p.rect(-p.width / 2, -p.height / 2, p.width, p.height);
+        p.rect(-simSize / 2, -simSize / 2, simSize, simSize);
         sim1.end();
 
         [sim0, sim1] = [sim1, sim0];
@@ -698,11 +680,11 @@ export const homeGradientShift: SketchDefinition = {
         smearShader.setUniform('u_data', sim0);
         smearShader.setUniform('u_prevColor', col0);
         smearShader.setUniform('u_bg', bgImg);
-        smearShader.setUniform('u_resolution', [p.width, p.height]);
+        smearShader.setUniform('u_resolution', [simSize, simSize]);
         smearShader.setUniform('u_smearStrength', 1.2);
         smearShader.setUniform('u_deposit', 0.06);
         smearShader.setUniform('u_fade', 0.985);
-        p.rect(-p.width / 2, -p.height / 2, p.width, p.height);
+        p.rect(-simSize / 2, -simSize / 2, simSize, simSize);
         col1.end();
 
         [col0, col1] = [col1, col0];
@@ -710,17 +692,6 @@ export const homeGradientShift: SketchDefinition = {
         // Display pass
         p.resetShader();
         p.image(col0, -p.width/2, -p.height/2, p.width, p.height);
-      },
-      windowResized: () => {
-        for (const l of layers) {
-          l.resize();
-        }
-        sim0.resize(p.width, p.height);
-        sim1.resize(p.width, p.height);
-        col0.resize(p.width, p.height);
-        col1.resize(p.width, p.height);
-        oldWidth = p.width;
-        oldHeight = p.height;
       },
       dispose: () => {
         for (const l of layers) {
