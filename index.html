@@ -3,8 +3,14 @@
   <head>
     <script>
       // Convert URL to hash mode if needed
-      if (location.path !== '/' && !location.hash) {
-        location.replace('#' + location.pathname + location.search);
+      if (!location.hash && location.pathname !== '/') {
+        const newUrl = 
+          location.origin +
+          '/#' +
+          location.pathname +
+          location.search +
+          location.hash;
+        location.replace(newUrl);
       }
     </script>
     <meta charset="UTF-8">
