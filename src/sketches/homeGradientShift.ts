@@ -615,7 +615,6 @@ export const homeGradientShift: SketchDefinition = {
     return {
       setup: (ctx) => {
         p = ctx.p;
-        p.randomSeed(998);
         setupColors();
         p.smooth();
         for (let i = 0; i < 8; i++) {
