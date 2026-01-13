@@ -50,15 +50,12 @@ function onClick(ev: MouseEvent) {
 <style scoped>
 .app-btn {
   margin-top: 6px;
-  padding: 10px 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid #0b0b0f;
   cursor: pointer;
-  color: #111;
+  color: #0b0b0f;
   box-shadow:
     0 0 2px rgba(16, 16, 16, 0.5);
-  backdrop-filter: blur(8px);
-  transition: opacity 120ms ease, transform 120ms ease;
 }
 
 .app-btn:hover {
@@ -76,8 +73,8 @@ function onClick(ev: MouseEvent) {
 .app-btn.lg { min-height: 52px; padding: 0 18px; }
 
 .app-btn.primary { background: rgba(255, 255, 255, 0.48); font-weight: 600; }
-.app-btn.secondary { background: rgba(255, 255, 255, 0.3); }
-.app-btn.ghost { background: rgba(255, 255, 255, 0.12); }
+.app-btn.secondary { background: rgba(255, 255, 255, 0.2); }
+.app-btn.ghost { background: rgba(255, 255, 255, 0.08); }
 
 .app-btn.block { width: 100%; }
 
