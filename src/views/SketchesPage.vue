@@ -5,16 +5,19 @@ import { usePersistentRef } from '@/composables/usePersistentRef';
 import P5Sketch from '@/components/P5Sketch.vue';
 import { SKETCHES, getSketchById } from '@/sketches';
 import type { SketchDefinition } from '@/sketches/types';
+import AppButton from '@/components/AppButton.vue';
+import LoadingButton from '@/components/LoadingButton.vue';
 
 const route = useRoute();
 const router = useRouter();
 
 const reloadKey = ref(0);
+const isReloading = ref(false);
 const fallbackId = SKETCHES[0]?.id ?? ''
 const selectedId = usePersistentRef<string>('selectedSketchId', fallbackId);
 
 function normalizeId(id: string) {
-  return SKETCHES.some(s => s.id === id) ? id : fallbackId;
+  return SKETCHES.some((s) => s.id === id) ? id : fallbackId;
 }
 
 const sketchIdFromQuery = typeof route.query.sketch === 'string' ? route.query.sketch : null;
@@ -30,12 +33,11 @@ watch(
     }
 
     router.replace({
-      query: { ...route.query, sketch: normalized,
-      },
+      query: { ...route.query, sketch: normalized },
     });
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 
 if (SKETCHES.length === 0) {
   throw new Error('No sketches registered in SKETCHES.');
@@ -44,6 +46,11 @@ const fallbackDefinition: SketchDefinition = SKETCHES[0]!;
 const activeDefinition = computed(() => getSketchById(selectedId.value) ?? fallbackDefinition);
 
 function reloadCurrent() {
+  if (isReloading.value) {
+    return;
+  }
+
+  isReloading.value = true;
   reloadKey.value++;
 }
 
@@ -71,12 +78,19 @@ function goHome() {
       </header>
       <div class="stage-wrapper">
         <div class="stage">
-          <P5Sketch :key="reloadKey" :definition="activeDefinition" overlayAlign="none" />
+          <P5Sketch
+            :key="reloadKey"
+            :definition="activeDefinition"
+            overlayAlign="none"
+            @loading-change="isReloading = $event"
+          />
         </div>
       </div>
       <footer class="controls bottom">
-        <button class="btn" @click="reloadCurrent">Reload</button>
-        <button class="btn" @click="goHome">Home</button>
+        <LoadingButton @click="reloadCurrent" size="sm" :loading="isReloading"
+          >Reload
+        </LoadingButton>
+        <AppButton @click="goHome" size="sm">Home</AppButton>
       </footer>
     </section>
   </main>
@@ -97,13 +111,12 @@ function goHome() {
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
 
-  background:
-    radial-gradient(
-      circle at 50% 20%,
-      rgba(255, 255, 255, 0.06),
-      transparent 70%,
-      #888
-    );
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(255, 255, 255, 0.26),
+    transparent 85%,
+    #0b0b0f
+  );
 }
 
 .sketch-card {
@@ -121,6 +134,10 @@ function goHome() {
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.45),
     inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+  background: rgba(200, 200, 200, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
 }
 
 .stage-wrapper {
@@ -144,7 +161,7 @@ function goHome() {
 
 .stage :deep(.sketch-root) {
   width: 100%;
-  height: 100%
+  height: 100%;
 }
 
 .controls {
@@ -170,27 +187,5 @@ function goHome() {
   padding: 10px 12px;
   color: #111;
   outline: none;
-}
-
-.btn {
-  border: 0;
-  border-radius: 12px;
-  padding: 10px 14px;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.1);
-  color: #111;
-  box-shadow:
-    0 0 3px rgba(16, 16, 16, 0.5);
-  display: block;
-}
-
-.primary {
-  background: rgba(255, 255, 255, 0.16);
-  font-weight: 600;
-}
-
-.btn:hover {
-  box-shadow:
-    0 0 3px rgba(16, 16, 16, 0.9);
 }
 </style>
