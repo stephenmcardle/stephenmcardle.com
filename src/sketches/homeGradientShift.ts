@@ -407,7 +407,7 @@ export const homeGradientShift: SketchDefinition = {
     }
     
     vec3 filterColor(vec3 color) {
-      return vec3(mod(color.x + u_hueRotation, 1.0), min(color.y * u_saturation, 1.0), min(color.z * u_brightness, 1.0));
+      return vec3(mod(color.x + u_hueRotation, 1.0), clamp(color.y * u_saturation, 0.0, 1.0), clamp(color.z * u_brightness, 0.0, 1.0));
     }
     
     vec4 convolute(sampler2D tex, mat3 kernel) {
@@ -435,21 +435,6 @@ export const homeGradientShift: SketchDefinition = {
       vec4 clr6 = texture2D(tex6, vTexCoord);
       vec4 clr7 = texture2D(tex7, vTexCoord);
         
-      // mat3 sharpen = mat3(0, -1, 0, -1, 5, -1, 0, -1, 0);
-      // mat3 gaussianBlur = mat3(1, 2, 1, 2, 4, 2, 1, 2, 1) * 0.0625;
-      // mat3 boxBlur = mat3(1, 1, 1, 1, 1, 1, 1, 1, 1) * 0.1111;
-    
-      // mat3 kernel = sharpen;
-    
-      // vec4 clr0 = convolute(tex0, kernel);
-      // vec4 clr1 = convolute(tex1, kernel);
-      // vec4 clr2 = convolute(tex2, kernel);
-      // vec4 clr3 = convolute(tex3, kernel);
-      // vec4 clr4 = convolute(tex4, kernel);
-      // vec4 clr5 = convolute(tex5, kernel);
-      // vec4 clr6 = convolute(tex6, kernel);
-      // vec4 clr7 = convolute(tex7, kernel);
-        
       vec4 color = clr0;
       color = blend(color, clr1);
       color = blend(color, clr2);
@@ -462,8 +447,6 @@ export const homeGradientShift: SketchDefinition = {
       vec3 hsvColor = rgb2hsv(color.rgb);
       hsvColor = filterColor(hsvColor);
       vec4 rgbColor = vec4(hsv2rgb(hsvColor), color.a);
-
-      rgbColor = vec4(rgbColor.r, clamp(rgbColor.g, 0.0, 0.8), rgbColor.ba);
       
       gl_FragColor = rgbColor;
     }
