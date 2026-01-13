@@ -80,8 +80,8 @@ function goHome() {
         </div>
       </div>
       <footer class="controls bottom">
-        <LoadingButton @click="reloadCurrentSketch" size="sm" :loading="isReloading"
-          >Reload
+        <LoadingButton @click="reloadCurrentSketch" size="sm" :loading="isReloading" :showSpinner="false" loading-text="Reload">
+          Reload
         </LoadingButton>
         <AppButton @click="goHome" size="sm">Home</AppButton>
       </footer>

@@ -9,6 +9,7 @@ const props = withDefaults(
   defineProps<{
     loading: boolean;
     loadingText?: string;
+    showSpinner?: boolean;
     disabled?: boolean;
     type?: ButtonType;
     variant?: Variant;
@@ -16,6 +17,7 @@ const props = withDefaults(
     block?: boolean;
   }>(),
   {
+    showSpinner: true,
     disabled: false,
     type: 'button',
     variant: 'secondary',
@@ -54,7 +56,7 @@ function onClick(ev: MouseEvent) {
         <slot />
       </span>
 
-      <span class="btn-spinner" :class="{ visible: loading }" aria-hidden="true" />
+      <span v-if="showSpinner" class="btn-spinner" :class="{ visible: loading }" aria-hidden="true" />
 
       <span v-if="loadingText" class="btn-loading-text" :class="{ visible: loading }">
         {{ loadingText }}
