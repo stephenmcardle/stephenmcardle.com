@@ -3,14 +3,24 @@ import { ref, onMounted } from "vue";
 import AppButton from '@/components/AppButton.vue';
 import LoadingButton from '@/components/LoadingButton.vue';
 import P5Sketch from "@/components/P5Sketch.vue";
+import type { P5SketchExposed } from "@/components/p5/types";
 import { defaultSketch } from "@/sketches";
 
-const active = ref(defaultSketch());
-const reloadKey = ref(0);
+const sketchRef = ref<P5SketchExposed | null>(null);
+const activeDefinition = ref(defaultSketch());
 const isReloading = ref(false);
 
-function reloadBackground() {
-  reloadKey.value++;
+async function reloadCurrentSketch() {
+  if (isReloading.value) {
+    return;
+  }
+
+  isReloading.value = true;
+  try {
+    await sketchRef.value?.reload();
+  } finally {
+    isReloading.value = false;
+  }
 }
 
 
@@ -22,8 +32,8 @@ onMounted(() => {
 
 <template>
     <P5Sketch
-      :key="reloadKey"
-      :definition="active"
+      ref="sketchRef"
+      :definition="activeDefinition"
       overlayAlign="center"
       :showLoadingOverlay="false"
       @loading-change="isReloading = $event"
@@ -48,7 +58,7 @@ onMounted(() => {
               <font-awesome-icon class="fa-3x icon" :icon="['fa', 'square-envelope']" />
             </a>
           </div>
-          <LoadingButton class="btn-left" size="md" :loading="isReloading" @click="reloadBackground">
+          <LoadingButton class="btn-left" size="md" :loading="isReloading" @click="reloadCurrentSketch">
             New Background
           </LoadingButton>
           <RouterLink to="/sketches"><AppButton size="md">More Sketches</AppButton></RouterLink>

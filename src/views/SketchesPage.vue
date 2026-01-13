@@ -5,13 +5,15 @@ import { usePersistentRef } from '@/composables/usePersistentRef';
 import P5Sketch from '@/components/P5Sketch.vue';
 import { SKETCHES, getSketchById } from '@/sketches';
 import type { SketchDefinition } from '@/sketches/types';
+import type { P5SketchExposed } from '@/components/p5/types';
 import AppButton from '@/components/AppButton.vue';
 import LoadingButton from '@/components/LoadingButton.vue';
 
 const route = useRoute();
 const router = useRouter();
 
-const reloadKey = ref(0);
+const sketchRef = ref<P5SketchExposed | null>(null);
+
 const isReloading = ref(false);
 const fallbackId = SKETCHES[0]?.id ?? ''
 const selectedId = usePersistentRef<string>('selectedSketchId', fallbackId);
@@ -45,13 +47,17 @@ if (SKETCHES.length === 0) {
 const fallbackDefinition: SketchDefinition = SKETCHES[0]!;
 const activeDefinition = computed(() => getSketchById(selectedId.value) ?? fallbackDefinition);
 
-function reloadCurrent() {
+async function reloadCurrentSketch() {
   if (isReloading.value) {
     return;
   }
 
   isReloading.value = true;
-  reloadKey.value++;
+  try {
+    await sketchRef.value?.reload();
+  } finally {
+    isReloading.value = false;
+  }
 }
 
 function onSelectChange(e: Event) {
@@ -79,7 +85,7 @@ function goHome() {
       <div class="stage-wrapper">
         <div class="stage">
           <P5Sketch
-            :key="reloadKey"
+            ref="sketchRef"
             :definition="activeDefinition"
             overlayAlign="none"
             @loading-change="isReloading = $event"
@@ -87,7 +93,7 @@ function goHome() {
         </div>
       </div>
       <footer class="controls bottom">
-        <LoadingButton @click="reloadCurrent" size="sm" :loading="isReloading"
+        <LoadingButton @click="reloadCurrentSketch" size="sm" :loading="isReloading"
           >Reload
         </LoadingButton>
         <AppButton @click="goHome" size="sm">Home</AppButton>
