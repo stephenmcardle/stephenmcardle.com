@@ -481,11 +481,11 @@ export const homeGradientShift: SketchDefinition = {
       float pressure = data.x;
       float pVel = data.y;
 
-      // float vDamp = exp(-6.0 * u_dt);
-      // float pDamp = exp(-4.0 * u_dt);
+      float vMult = exp(3.0 * u_dt);
+      float pMult = exp(2.0 * u_dt);
 
-      // pVel *= vDamp;
-      // pressure *= pDamp;
+      pVel *= vMult;
+      pressure *= pMult;
 
       float p_left = texture2D(u_prev, uv + vec2(texelSize.x, 0.0)).x;
       float p_right = texture2D(u_prev, uv - vec2(texelSize.x, 0.0)).x;
@@ -522,33 +522,6 @@ export const homeGradientShift: SketchDefinition = {
     }
     `;
 
-    // const renderFragSrc = `
-    // #ifdef GL_ES
-    // precision highp float;
-    // #endif
-
-    // varying vec2 vTexCoord;
-    // uniform sampler2D u_data;
-    // uniform sampler2D u_tex;
-    // uniform vec2 u_resolution;
-
-    // void main() {
-    //   vec2 uv = vTexCoord;
-
-    //   vec4 data = texture2D(u_data, uv);
-
-    //   vec4 clr = texture2D(u_tex, uv + 0.08 * data.zw);
-
-    //   vec3 normal = normalize(vec3(-data.z, 0.2, -data.w));
-    //   vec3 lightDir = normalize(vec3(-3.0, 10.0, 3.0));
-    //   float spec = pow(max(0.0, dot(normal, lightDir)), 30.0);
-
-    //   clr += vec4(1.0) * (0.25 * spec);
-    //   gl_FragColor = clr;
-
-    // }
-    // `;
-
     const smearFragSrc = `
     #ifdef GL_ES
     precision highp float;
@@ -584,7 +557,6 @@ export const homeGradientShift: SketchDefinition = {
 
       vec4 fresh = texture2D(u_bg, uv);
 
-      // float paint = clamp(abs(data.x) * 0.8, 0.0, 1.0);
       vec4 clr = advected * u_fade;
       clr = mix(clr, fresh, u_deposit);
 
@@ -650,7 +622,7 @@ export const homeGradientShift: SketchDefinition = {
         const mx = (p.mouseX / p.width) * simSize;
         const my = (p.mouseY / p.height) * simSize;
         bufferShader.setUniform('u_mouse', [mx, my, isMousePressed, 0.0]);
-        bufferShader.setUniform('u_dt', p.deltaTime / 1000);
+        bufferShader.setUniform('u_dt', p.deltaTime / 400);
         p.rect(-simSize / 2, -simSize / 2, simSize, simSize);
         sim1.end();
 
