@@ -3,26 +3,12 @@ import { ref, onMounted } from "vue";
 import AppButton from '@/components/AppButton.vue';
 import LoadingButton from '@/components/LoadingButton.vue';
 import P5Sketch from "@/components/P5Sketch.vue";
-import type { P5SketchExposed } from "@/components/p5/types";
 import { defaultSketch } from "@/sketches";
+import { useSketchController } from "@/composables/useSketchController";
 
-const sketchRef = ref<P5SketchExposed | null>(null);
+const { sketchRef, isReloading, reloadCurrentSketch, onLoadingChange } = useSketchController();
+
 const activeDefinition = ref(defaultSketch());
-const isReloading = ref(false);
-
-async function reloadCurrentSketch() {
-  if (isReloading.value) {
-    return;
-  }
-
-  isReloading.value = true;
-  try {
-    await sketchRef.value?.reload();
-  } finally {
-    isReloading.value = false;
-  }
-}
-
 
 onMounted(() => {
   import('@/views/SketchesPage.vue');
@@ -36,7 +22,7 @@ onMounted(() => {
       :definition="activeDefinition"
       overlayAlign="center"
       :showLoadingOverlay="false"
-      @loading-change="isReloading = $event"
+      @loading-change="onLoadingChange"
     >
       <div class="hero-overlay">
         <img class="hero-image" src="/img/self.jpg" />

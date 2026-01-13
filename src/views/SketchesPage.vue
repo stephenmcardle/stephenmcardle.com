@@ -8,13 +8,13 @@ import type { SketchDefinition } from '@/sketches/types';
 import type { P5SketchExposed } from '@/components/p5/types';
 import AppButton from '@/components/AppButton.vue';
 import LoadingButton from '@/components/LoadingButton.vue';
+import { useSketchController } from '@/composables/useSketchController';
 
 const route = useRoute();
 const router = useRouter();
 
-const sketchRef = ref<P5SketchExposed | null>(null);
+const { sketchRef, isReloading, reloadCurrentSketch, onLoadingChange } = useSketchController();
 
-const isReloading = ref(false);
 const fallbackId = SKETCHES[0]?.id ?? ''
 const selectedId = usePersistentRef<string>('selectedSketchId', fallbackId);
 
@@ -47,19 +47,6 @@ if (SKETCHES.length === 0) {
 const fallbackDefinition: SketchDefinition = SKETCHES[0]!;
 const activeDefinition = computed(() => getSketchById(selectedId.value) ?? fallbackDefinition);
 
-async function reloadCurrentSketch() {
-  if (isReloading.value) {
-    return;
-  }
-
-  isReloading.value = true;
-  try {
-    await sketchRef.value?.reload();
-  } finally {
-    isReloading.value = false;
-  }
-}
-
 function onSelectChange(e: Event) {
   selectedId.value = (e.target as HTMLSelectElement).value;
 }
@@ -88,7 +75,7 @@ function goHome() {
             ref="sketchRef"
             :definition="activeDefinition"
             overlayAlign="none"
-            @loading-change="isReloading = $event"
+            @loading-change="onLoadingChange"
           />
         </div>
       </div>
