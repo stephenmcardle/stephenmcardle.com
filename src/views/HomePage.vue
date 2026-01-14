@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import AppButton from '@/components/AppButton.vue';
 import LoadingButton from '@/components/LoadingButton.vue';
 import P5Sketch from "@/components/P5Sketch.vue";
@@ -9,6 +9,17 @@ import { useSketchController } from "@/composables/useSketchController";
 const { reloadKey, isReloading, reloadCurrentSketch, onLoadingChange } = useSketchController();
 
 const activeDefinition = ref(defaultSketch());
+
+const userRequested = ref(false);
+
+function handleNewBackgroundClick() {
+  userRequested.value = true;
+  reloadCurrentSketch();
+}
+
+watch(isReloading, (v) => {
+  if (!v) userRequested.value = false;
+});
 
 onMounted(() => {
   import('@/views/SketchesPage.vue');
@@ -44,7 +55,13 @@ onMounted(() => {
               <font-awesome-icon class="fa-3x fa-width-auto icon" :icon="['fa', 'square-envelope']" />
             </a>
           </div>
-          <LoadingButton class="btn-left" size="md" :loading="isReloading" @click="reloadCurrentSketch">
+          <LoadingButton
+            class="btn-left"
+            size="md"
+            :loading="isReloading && userRequested"
+            :disabled="isReloading"
+            @click="handleNewBackgroundClick"
+          >
             New Background
           </LoadingButton>
           <RouterLink to="/sketches"><AppButton size="md">More Sketches</AppButton></RouterLink>
