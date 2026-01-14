@@ -5,7 +5,6 @@ import { usePersistentRef } from '@/composables/usePersistentRef';
 import P5Sketch from '@/components/P5Sketch.vue';
 import { SKETCHES, getSketchById } from '@/sketches';
 import type { SketchDefinition } from '@/sketches/types';
-import type { P5SketchExposed } from '@/components/p5/types';
 import AppButton from '@/components/AppButton.vue';
 import LoadingButton from '@/components/LoadingButton.vue';
 import { useSketchController } from '@/composables/useSketchController';
@@ -13,7 +12,7 @@ import { useSketchController } from '@/composables/useSketchController';
 const route = useRoute();
 const router = useRouter();
 
-const { sketchRef, isReloading, reloadCurrentSketch, onLoadingChange } = useSketchController();
+const { reloadKey, isReloading, reloadCurrentSketch, onLoadingChange } = useSketchController();
 
 const fallbackId = SKETCHES[0]?.id ?? ''
 const selectedId = usePersistentRef<string>('selectedSketchId', fallbackId);
@@ -49,6 +48,7 @@ const activeDefinition = computed(() => getSketchById(selectedId.value) ?? fallb
 
 function onSelectChange(e: Event) {
   selectedId.value = (e.target as HTMLSelectElement).value;
+  reloadKey.value++;
 }
 
 function goHome() {
@@ -72,7 +72,7 @@ function goHome() {
       <div class="stage-wrapper">
         <div class="stage">
           <P5Sketch
-            ref="sketchRef"
+            :key="reloadKey"
             :definition="activeDefinition"
             overlayAlign="none"
             @loading-change="onLoadingChange"
@@ -80,7 +80,7 @@ function goHome() {
         </div>
       </div>
       <footer class="controls bottom">
-        <LoadingButton @click="reloadCurrentSketch" size="sm" :loading="isReloading" :showSpinner="false" loading-text="Reload">
+        <LoadingButton @click="reloadCurrentSketch" size="sm" :loading="isReloading" :showSpinner="false" loadingText="Reload">
           Reload
         </LoadingButton>
         <AppButton @click="goHome" size="sm">Home</AppButton>

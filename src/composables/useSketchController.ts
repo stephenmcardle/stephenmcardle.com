@@ -1,12 +1,11 @@
 import { ref } from 'vue';
-import type { P5SketchExposed } from '@/components/p5/types';
 
 export function useSketchController() {
-  const sketchRef = ref<P5SketchExposed | null>(null);
+  const reloadKey = ref(0);
   const isReloading = ref(false);
 
   async function reloadCurrentSketch() {
-    await sketchRef.value?.reload();
+    reloadKey.value++;
   }
 
   function onLoadingChange(v: boolean) {
@@ -14,7 +13,7 @@ export function useSketchController() {
   }
 
   return {
-    sketchRef,
+    reloadKey,
     isReloading,
     reloadCurrentSketch,
     onLoadingChange,

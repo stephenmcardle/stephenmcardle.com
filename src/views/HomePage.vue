@@ -6,7 +6,7 @@ import P5Sketch from "@/components/P5Sketch.vue";
 import { defaultSketch } from "@/sketches";
 import { useSketchController } from "@/composables/useSketchController";
 
-const { sketchRef, isReloading, reloadCurrentSketch, onLoadingChange } = useSketchController();
+const { reloadKey, isReloading, reloadCurrentSketch, onLoadingChange } = useSketchController();
 
 const activeDefinition = ref(defaultSketch());
 
@@ -18,7 +18,7 @@ onMounted(() => {
 
 <template>
     <P5Sketch
-      ref="sketchRef"
+      :key="reloadKey"
       :definition="activeDefinition"
       overlayAlign="center"
       :showLoadingOverlay="false"

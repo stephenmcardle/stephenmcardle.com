@@ -121,33 +121,12 @@ function unmount() {
   inst = null;
 }
 
-async function restart() {
-  setLoading(true);
-  await nextTick();
-  inst?.noLoop();
-  unmount();
-  await nextTick();
-  await mount();
-}
-
-async function reload() {
-  await restart();
-}
-defineExpose({ reload });
-
 onMounted(async () => {
   await nextTick();
-  mount();
+  await mount();
 });
 
 onBeforeUnmount(unmount);
-
-watch(
-  () => props.definition,
-  async () => {
-    await restart();
-  }
-);
 </script>
 
 
