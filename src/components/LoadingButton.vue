@@ -65,7 +65,7 @@ function onClick(ev: MouseEvent) {
   </AppButton>
 </template>
 
-<style>
+<style scoped>
 .loading-btn {
   position: relative;
   display: inline-flex;

@@ -70,7 +70,7 @@ onMounted(() => {
     </P5Sketch>
 </template>
 
-<style>
+<style scoped>
 .hero-overlay {
   width: min(500px, 80vw);
   display: flex;
