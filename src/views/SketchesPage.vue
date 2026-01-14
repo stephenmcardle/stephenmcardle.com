@@ -103,13 +103,6 @@ function goHome() {
   padding: 16px;
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
-
-  background: radial-gradient(
-    circle at 50% 20%,
-    rgba(255, 255, 255, 0.26),
-    transparent 85%,
-    #0b0b0f
-  );
 }
 
 .sketch-card {
