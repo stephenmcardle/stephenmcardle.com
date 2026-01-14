@@ -56,7 +56,7 @@ function onClick(ev: MouseEvent) {
         <slot />
       </span>
 
-      <span v-if="showSpinner" class="btn-spinner" :class="{ visible: loading }" aria-hidden="true" />
+      <span class="btn-spinner" :class="{ visible: loading && showSpinner }" aria-hidden="true" />
 
       <span v-if="loadingText" class="btn-loading-text" :class="{ visible: loading }">
         {{ loadingText }}
