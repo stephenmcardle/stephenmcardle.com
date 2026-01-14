@@ -34,9 +34,6 @@ export const homeGradientShift: SketchDefinition = {
     function getNewFramebuffer() {
       const fb = p.createFramebuffer({ width: simSize, height: simSize });
       fb.pixelDensity(1);
-      fb.begin();
-      p.background(0);
-      fb.end();
       return fb;
     }
     
