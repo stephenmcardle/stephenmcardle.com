@@ -462,6 +462,7 @@ export const gradientShift: SketchDefinition = {
         for (const l of layers) {
           l.img.remove();
         }
+        pg.remove();
       }
     }
   }

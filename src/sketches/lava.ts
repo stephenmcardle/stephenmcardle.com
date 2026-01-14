@@ -405,6 +405,9 @@ export const lava: SketchDefinition = {
         p.resetShader();
         p.image(pg, -p.width/2, -p.height/2, p.width, p.height);
       },
+      dispose: () => {
+        pg.remove();
+      },
     }
   }
 }

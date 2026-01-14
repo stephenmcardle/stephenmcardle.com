@@ -655,6 +655,7 @@ export const homeGradientShift: SketchDefinition = {
         sim1.remove();
         col0.remove();
         col1.remove();
+        bgImg.remove();
       }
     }
   }
