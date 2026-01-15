@@ -41,7 +41,7 @@ onMounted(() => {
         <div class="hero-content">
           <h1>Stephen McArdle</h1>
           <p>Software Engineer • Generative Artist</p>
-          <a href=""><AppButton size="md">My Resume</AppButton></a>
+          <a href="/public/files/McArdle_Stephen_Resume.pdf"><AppButton size="md">My Resume</AppButton></a>
           <SocialIcons />
           <LoadingButton
             class="btn-left"
