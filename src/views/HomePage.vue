@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch } from 'vue';
 import AppButton from '@/components/AppButton.vue';
 import LoadingButton from '@/components/LoadingButton.vue';
 import SocialIcons from '@/components/SocialIcons.vue';
-import P5Sketch from "@/components/P5Sketch.vue";
-import { defaultSketch } from "@/sketches";
-import { useSketchController } from "@/composables/useSketchController";
+import P5Sketch from '@/components/P5Sketch.vue';
+import { defaultSketch } from '@/sketches';
+import { useSketchController } from '@/composables/useSketchController';
 
 const { reloadKey, isReloading, reloadCurrentSketch, onLoadingChange } = useSketchController();
 
@@ -25,10 +25,10 @@ watch(isReloading, (v) => {
 onMounted(() => {
   import('@/views/SketchesPage.vue');
 });
-
 </script>
 
 <template>
+  <div class="home-page">
     <P5Sketch
       :key="reloadKey"
       :definition="activeDefinition"
@@ -56,22 +56,31 @@ onMounted(() => {
         </div>
       </div>
     </P5Sketch>
+  </div>
 </template>
 
 <style scoped>
+.home-page {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .hero-overlay {
   width: min(500px, 80vw);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: clamp(12px, 2vh, 16px);
 
-  padding: 24px;
+  padding: clamp(16px, 3vh, 24px);
   max-width: min(720px, 92vw);
 }
 
 .hero-image {
-  width: 80%;
+  width: clamp(200px, 60vw, 400px);
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   display: block;
@@ -87,13 +96,23 @@ onMounted(() => {
   width: 100%;
   color: black;
   text-align: center;
-  padding: 18px;
-  padding-top: 8px;
+  padding: clamp(12px, 2vh, 18px);
+  padding-top: clamp(6px, 1vh, 8px);
   max-width: 600px;
   backdrop-filter: blur(6px);
   background: rgba(200, 200, 200, 0.5);
   border-radius: 12px;
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+.hero-content h1 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  margin: 0 0 clamp(8px, 1.5vh, 12px) 0;
+}
+
+.hero-content p {
+  font-size: clamp(0.875rem, 2vw, 1.125rem);
+  margin: 0 0 clamp(12px, 2vh, 16px) 0;
 }
 </style>

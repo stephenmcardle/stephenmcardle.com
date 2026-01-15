@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from "vue";
-import type { SketchDefinition, SketchContext, SketchInstance } from "@/sketches/types";
+import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue';
+import type { SketchDefinition, SketchContext, SketchInstance } from '@/sketches/types';
 
 type P5Constructor = typeof import('p5').default;
 let P5: P5Constructor | null = null;
@@ -24,8 +24,8 @@ const props = withDefaults(
   }
 );
 
-const overlayClass = computed(() => 
-  props.overlayAlign === 'center' ? 'overlay-center': 'overlay-none'
+const overlayClass = computed(() =>
+  props.overlayAlign === 'center' ? 'overlay-center' : 'overlay-none'
 );
 
 const host = ref<HTMLDivElement | null>(null);
@@ -80,7 +80,7 @@ async function mount() {
     p.setup = () => {
       const { width, height } = getHostSize();
       const renderer =
-        props.definition.renderer === "webgl" ? p.WEBGL : p.P2D;
+        props.definition.renderer === 'webgl' ? p.WEBGL : p.P2D;
 
       p.createCanvas(Math.max(1, width), Math.max(1, height), renderer);
       p.pixelDensity(window.devicePixelRatio || 1);
@@ -107,12 +107,12 @@ function unmount() {
   activeSketch = null;
 
   try {
-    const canvas = host.value?.querySelector("canvas") as HTMLCanvasElement | null;
+    const canvas = host.value?.querySelector('canvas') as HTMLCanvasElement | null;
     const gl =
-      (canvas?.getContext("webgl2") as WebGL2RenderingContext | null) ??
-      (canvas?.getContext("webgl") as WebGLRenderingContext | null);
+      (canvas?.getContext('webgl2') as WebGL2RenderingContext | null) ??
+      (canvas?.getContext('webgl') as WebGLRenderingContext | null)
 
-    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
   } catch {
     // ignore
   }
@@ -129,9 +129,11 @@ onMounted(async () => {
 onBeforeUnmount(unmount);
 </script>
 
-
 <template>
-  <section class="sketch-hero">
+  <section
+    class="sketch-hero sketch-root"
+    :class="{ 'overlay-center-mode': props.overlayAlign === 'center' }"
+  >
     <div ref="host" class="canvas-host">
       <div class="overlay" :class="overlayClass">
         <slot />
@@ -150,6 +152,15 @@ onBeforeUnmount(unmount);
   width: 100%;
   height: 100%;
   overflow: hidden;
+  z-index: 0;
+}
+
+.sketch-hero.overlay-center-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100dvh;
 }
 
 .canvas-host {
@@ -171,6 +182,20 @@ onBeforeUnmount(unmount);
   position: absolute;
   inset: 0;
   z-index: 2;
+  overflow: hidden;
+}
+
+.overlay-center-mode .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.overlay-none {
   pointer-events: none;
 }
 
@@ -179,8 +204,26 @@ onBeforeUnmount(unmount);
 }
 
 .overlay-center {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: clamp(16px, 3vh, 24px);
+  padding-top: max(clamp(16px, 3vh, 24px), env(safe-area-inset-top));
+  padding-bottom: max(clamp(16px, 3vh, 24px), env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* On short viewports, allow content to start from top and scroll */
+@media (max-height: 700px) {
+  .overlay-center {
+    align-items: flex-start;
+    padding-top: max(clamp(12px, 2vh, 16px), env(safe-area-inset-top));
+  }
+
+  .overlay-center :deep(.hero-overlay) {
+    margin-top: clamp(8px, 1.5vh, 16px);
+  }
 }
 
 .loading {
@@ -210,5 +253,4 @@ onBeforeUnmount(unmount);
 @media (prefers-reduced-motion: reduce) {
   .spinner { animation: none; }
 }
-
 </style>
