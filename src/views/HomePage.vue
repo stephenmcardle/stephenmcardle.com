@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from "vue";
 import AppButton from '@/components/AppButton.vue';
 import LoadingButton from '@/components/LoadingButton.vue';
+import SocialIcons from '@/components/SocialIcons.vue';
 import P5Sketch from "@/components/P5Sketch.vue";
 import { defaultSketch } from "@/sketches";
 import { useSketchController } from "@/composables/useSketchController";
@@ -41,20 +42,7 @@ onMounted(() => {
           <h1>Stephen McArdle</h1>
           <p>Software Engineer • Generative Artist</p>
           <a href=""><AppButton size="md">My Resume</AppButton></a>
-          <div class="social-icons">
-            <a href="https://github.com/stephenmcardle">
-              <font-awesome-icon class="fa-3x fa-width-auto icon" :icon="['fab', 'square-github']" />
-            </a>
-            <a href="https://www.linkedin.com/in/stephen-mcardle/">
-              <font-awesome-icon class="fa-3x fa-width-auto icon" :icon="['fab', 'square-linkedin']" />
-            </a>
-            <a href="https://instagram.com/generativeartworks">
-              <font-awesome-icon class="fa-3x fa-width-auto icon" :icon="['fab', 'square-instagram']" />
-            </a>
-            <a href="mailto:stephenwmcardle@gmail.com">
-              <font-awesome-icon class="fa-3x fa-width-auto icon" :icon="['fa', 'square-envelope']" />
-            </a>
-          </div>
+          <SocialIcons />
           <LoadingButton
             class="btn-left"
             size="md"
@@ -107,20 +95,5 @@ onMounted(() => {
   border-radius: 12px;
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.75);
-
-}
-
-.icon {
-  color: #0b0b0f;
-}
-
-.social-icons {
-  max-width: 600px;
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
 }
 </style>
